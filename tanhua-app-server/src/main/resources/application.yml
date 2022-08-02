@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: tanhua-app-server
+#目标是让该模块读取到配置信息
+tanhua:
+  sms:
+    signName: 物流云商
+    templateCode: SMS_106590012
+    accessKey: LTAI4GKgob9vZ53k2SZdyAC7
+    secret: LHLBvXmILRoyw0niRSBuXBZewQ30la
