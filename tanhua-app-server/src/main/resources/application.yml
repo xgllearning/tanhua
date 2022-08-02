@@ -1,6 +1,22 @@
+#服务端口
+server:
+  port: 18080
 spring:
   application:
     name: tanhua-app-server
+  redis:  #redis配置
+    port: 6379
+    host: 192.168.136.160
+  cloud:  #nacos配置
+    nacos:
+      discovery:
+        server-addr: 192.168.136.160:8848
+#dubbo配置
+dubbo:
+  registry:
+    address: spring-cloud://localhost
+  consumer:
+    check: false
 #目标是让该模块读取到配置信息
 tanhua:
   sms:
