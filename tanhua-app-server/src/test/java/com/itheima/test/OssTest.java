@@ -4,7 +4,14 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
+import com.tanhua.autoconfig.template.OssTemplate;
+import com.tanhua.server.AppServerApplication;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -19,8 +26,19 @@ import java.util.UUID;
  *     将资料中的1.jpg上传到阿里云OSS
  *       存放的位置   /yyyy/MM/dd/xxxx.jpg
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = AppServerApplication.class)
 public class OssTest {
+    @Autowired
+    private OssTemplate ossTemplate;
 
+    @Test
+    public void testTemplateUpload() throws FileNotFoundException {
+        String path = "C:\\study\\探花交友\\探花交友\\02-完善用户信息\\03-资料\\1.jpg";
+        FileInputStream inputStream = new FileInputStream(new File(path));
+        String imageUrl = ossTemplate.upload(path, inputStream);
+        System.out.println(imageUrl);
+    }
     @Test
     public void testOss() throws FileNotFoundException {
         //1、配置图片路径
