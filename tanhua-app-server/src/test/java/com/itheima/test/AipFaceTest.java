@@ -1,11 +1,28 @@
 package com.itheima.test;
 
 import com.baidu.aip.face.AipFace;
+import com.tanhua.autoconfig.template.AipFaceTemplate;
+import com.tanhua.server.AppServerApplication;
 import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = AppServerApplication.class)
 public class AipFaceTest {
+    @Autowired
+    public AipFaceTemplate aipFaceTemplate;
+
+    @Test
+    public void detect(){
+        boolean detect = aipFaceTemplate.detect("https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg");
+        System.out.println(detect);
+    }
+
 
     //设置APPID/AK/SK
     public static final String APP_ID = "";

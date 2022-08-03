@@ -30,3 +30,7 @@ tanhua:
     endpoint:
     bucketName:
     url:
+  aip:
+    appId:
+    apiKey:
+    secretKey:
