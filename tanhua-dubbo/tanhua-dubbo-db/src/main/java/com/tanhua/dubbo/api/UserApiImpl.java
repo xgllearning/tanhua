@@ -21,4 +21,10 @@ public class UserApiImpl implements UserApi{
         queryWrapper.eq(StringUtils.isNotBlank(mobile),User::getMobile,mobile);
         return userMapper.selectOne(queryWrapper);
     }
+
+    @Override
+    public Long save(User user) {
+        userMapper.insert(user);
+        return user.getId();
+    }
 }
