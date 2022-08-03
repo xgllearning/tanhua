@@ -37,7 +37,7 @@ public class LoginController {
     public ResponseEntity loginVerification(@RequestBody Map map){
         //1.获取map中的请求参数
         String phone = (String) map.get("phone");
-        String code = (String) map.get("loginVerification");
+        String code = (String) map.get("verificationCode");
         //2.调用userService完成用户登录
         Map retMap = userService.loginVerification(phone,code);
         return ResponseEntity.ok(retMap);
