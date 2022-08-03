@@ -135,11 +135,6 @@
                 <artifactId>mongodb-driver-sync</artifactId>
                 <version>${mongodb.version}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.mongodb</groupId>-->
-<!--                <artifactId>mongodb-driver-sync</artifactId>-->
-<!--                <version>4.0.5</version>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
