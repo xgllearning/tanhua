@@ -74,8 +74,8 @@ public class UserService {
         if (Objects.isNull(user)){
             user = new User();
             user.setMobile(phone);
-            user.setCreated(new Date());
-            user.setUpdated(new Date());
+//            user.setCreated(new Date());
+//            user.setUpdated(new Date());
             user.setPassword(DigestUtils.md5Hex("123456"));
             Long userId = userApi.save(user);
             //进入则为新用户,将isNew设为true

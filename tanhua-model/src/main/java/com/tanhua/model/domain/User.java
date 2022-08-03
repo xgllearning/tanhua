@@ -10,11 +10,11 @@ import java.util.Date;
 @Data
 @AllArgsConstructor  //满参构造方法
 @NoArgsConstructor   //无参构造方法
-public class User implements Serializable {
+public class User extends BasePojo {
 
     private Long id;
     private String mobile;
     private String password;
-    private Date created;
-    private Date updated;
+//    private Date created;
+//    private Date updated;
 }
