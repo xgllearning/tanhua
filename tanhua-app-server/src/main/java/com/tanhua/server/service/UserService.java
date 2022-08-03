@@ -44,7 +44,7 @@ public class UserService {
         //2.调用发送短信模板template对象，发送手机短信
         //template.sendSms(phone,code);
         //3.将验证码存入redis中
-        redisTemplate.opsForValue().set("CHECK_CODE_"+phone,code, Duration.ofMinutes(5));//验证码失效时间
+        redisTemplate.opsForValue().set("CHECK_CODE_"+phone,code, Duration.ofMinutes(10));//验证码失效时间
         //4、构建返回值
         //ok(),里面放之前的返回内容，正常返回状态码200，可以通过status设置
         //return ResponseEntity.status(500).body("出错了");
@@ -78,6 +78,7 @@ public class UserService {
 //            user.setUpdated(new Date());
             user.setPassword(DigestUtils.md5Hex("123456"));
             Long userId = userApi.save(user);
+            user.setId(userId);
             //进入则为新用户,将isNew设为true
             isNew = true;
         }
