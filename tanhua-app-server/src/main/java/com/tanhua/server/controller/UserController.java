@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
@@ -41,7 +42,29 @@ public class UserController {
 
     }
 
+    /**更新用户头像
+     * 接口路径	/user/loginReginfo/head
+     * 请求方式	POST
+     * 请求header	Authorization
+     * 请求参数	headPhoto
+     * 响应结果	ResponseEntity
+     */
+    @PostMapping("/loginReginfo/head")
+    public ResponseEntity updateUserInfo(MultipartFile headPhoto,@RequestHeader("Authorization") String token){
+        //1.验证token是否合法，通过JwtUtils
+        boolean verifyToken = JwtUtils.verifyToken(token);
+        if (!verifyToken){//token不合法
+            return ResponseEntity.status(401).body(null);
+        }
+        //2.token合法则解析token，并拿到token中的用户id
+        Claims claims = JwtUtils.getClaims(token);
+        //String类型转Integer
+        Integer id = (Integer) claims.get("id");
+        //根据用户id更新上传的图片
+        userInfoService.updateHead(headPhoto,id);
+        return ResponseEntity.ok(null);
 
+    }
 
 
 }
