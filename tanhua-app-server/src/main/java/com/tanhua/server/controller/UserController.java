@@ -66,23 +66,23 @@ public class UserController {
 //        Claims claims = JwtUtils.getClaims(token);
 //        //String类型转Integer
 //        Integer id = (Integer) claims.get("id");
-        try {
+//        try {
             //从ThreadLocal获取用户id
             Long id = UserHolder.getUserId();
             //根据用户id更新上传的图片
             userInfoService.updateHead(headPhoto,id);
             return ResponseEntity.ok(null);
-        }catch (BusinessException be){//先捕获自定义异常
-            ////TODO：这些都是可以预知的异常信息
-            ErrorResult errorResult = be.getErrorResult();
-            //springboot内部也提供枚举的方式返回状态码
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
-        } catch (Exception e) {
-            //TODO：这些都是不可预知的异常信息
-            e.printStackTrace();
-            //springboot内部也提供枚举的方式返回状态码
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResult.error());
-        }
+//        }catch (BusinessException be){//先捕获自定义异常
+//            ////TODO：这些都是可以预知的异常信息
+//            ErrorResult errorResult = be.getErrorResult();
+//            //springboot内部也提供枚举的方式返回状态码
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
+//        } catch (Exception e) {
+//            //TODO：这些都是不可预知的异常信息
+//            e.printStackTrace();
+//            //springboot内部也提供枚举的方式返回状态码
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResult.error());
+//        }
 
     }
 

@@ -39,24 +39,24 @@ public class LoginController {
     @PostMapping("/loginVerification")
     public ResponseEntity loginVerification(@RequestBody Map map){
 
-        try {
+//        try {
             //1.获取map中的请求参数
             String phone = (String) map.get("phone");
             String code = (String) map.get("verificationCode");
             //2.调用userService完成用户登录
             Map retMap = userService.loginVerification(phone,code);
             return ResponseEntity.ok(retMap);
-        }catch (BusinessException be){//先捕获自定义异常
-            ////TODO：这些都是可以预知的异常信息
-            ErrorResult errorResult = be.getErrorResult();
-            //springboot内部也提供枚举的方式返回状态码
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
-        }catch (Exception e) {//如果不是自定义异常，捕获大的，可能就是空指针等异常...
-            //TODO：这些都是不可预知的异常信息
-            e.printStackTrace();
-            //springboot内部也提供枚举的方式返回状态码
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResult.error());
-        }
+//        }catch (BusinessException be){//先捕获自定义异常
+//            ////TODO：这些都是可以预知的异常信息
+//            ErrorResult errorResult = be.getErrorResult();
+//            //springboot内部也提供枚举的方式返回状态码
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
+//        }catch (Exception e) {//如果不是自定义异常，捕获大的，可能就是空指针等异常...
+//            //TODO：这些都是不可预知的异常信息
+//            e.printStackTrace();
+//            //springboot内部也提供枚举的方式返回状态码
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResult.error());
+//        }
 
     }
 }
