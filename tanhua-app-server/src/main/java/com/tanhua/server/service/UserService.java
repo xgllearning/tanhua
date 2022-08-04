@@ -4,6 +4,8 @@ import com.tanhua.autoconfig.template.SmsTemplate;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
+import com.tanhua.model.vo.ErrorResult;
+import com.tanhua.server.exception.BusinessException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,8 +64,8 @@ public class UserService {
         String redisCode = redisTemplate.opsForValue().get("CHECK_CODE_" + phone);
         //2.对验证码进行校验,redis中验证码是否存在和是否与输入的一致
         if (StringUtils.isEmpty(redisCode)||!StringUtils.equals(redisCode,code)){
-            //验证码无效
-            throw  new RuntimeException("验证码错误");
+            //验证码无效,抛出自定义异常(可预知的错误，如图片不合法，验证码错误等等。这类错误也可以理解为业务异常，可以通过自定义异常类来处理；)
+            throw  new BusinessException(ErrorResult.loginError());
         }
         //3.验证码通过后，删除redis中的验证码
         redisTemplate.delete("CHECK_CODE_" + phone);

@@ -4,8 +4,10 @@ import com.tanhua.autoconfig.template.AipFaceTemplate;
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.UserInfoVo;
 
+import com.tanhua.server.exception.BusinessException;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +41,10 @@ public class UserInfoService {
             String imageUrl = ossTemplate.upload(headPhoto.getOriginalFilename(), headPhoto.getInputStream());
             //2.调用百度云进行人脸验证
             boolean detect = aipFaceTemplate.detect(imageUrl);
-            //2.1如果不包含人脸，抛出异常
+            //2.1如果不包含人脸，抛出异常(可预知的错误，如图片不合法，验证码错误等等。这类错误也可以理解为业务异常，可以通过自定义异常类来处理；)
             if (!detect){
-                throw new RuntimeException("不包含人脸");
+//                throw new RuntimeException("不包含人脸");
+                throw new BusinessException(ErrorResult.faceError());
             }else{
                 //2.2包含人脸，调用Api更新
                 UserInfo userInfo = new UserInfo();
