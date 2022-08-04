@@ -37,4 +37,9 @@ public class TokenInterceptor implements HandlerInterceptor {
         //由此可以省略解析的步骤
         return true;
     }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        UserHolder.remove();
+    }
 }
