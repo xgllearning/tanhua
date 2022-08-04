@@ -21,4 +21,14 @@ public class UserInfoApiImpl implements UserInfoApi {
     public void update(UserInfo userInfo) {
         userInfoMapper.updateById(userInfo);
     }
+
+    /**
+     * 根据ID查询个人资料(详细信息)
+     * @param userID
+     * @return
+     */
+    @Override
+    public UserInfo findById(Long userID) {
+        return userInfoMapper.selectById(userID);
+    }
 }

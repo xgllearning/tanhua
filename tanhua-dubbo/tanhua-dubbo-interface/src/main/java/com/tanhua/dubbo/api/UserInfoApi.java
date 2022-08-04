@@ -9,4 +9,6 @@ public interface UserInfoApi {
 
     //更新用户详细信息
     public void update(UserInfo userInfo);
+    //根据ID查询个人资料(详细信息)
+    UserInfo findById(Long userID);
 }

@@ -45,6 +45,7 @@ public class UserInfoService {
                 //设置id
                 userInfo.setId(Long.valueOf(id));
                 //设置头像链接地址
+                imageUrl="https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
                 userInfo.setAvatar(imageUrl);
                 userInfoApi.update(userInfo);
             }
@@ -54,5 +55,16 @@ public class UserInfoService {
         }
 
 
+    }
+
+    /**
+     * 根据ID查询个人资料(详细信息)
+     * @param userID
+     * @return
+     */
+    public UserInfo findById(Long userID) {
+        UserInfo userInfo=userInfoApi.findById(userID);
+
+        return userInfo;
     }
 }
