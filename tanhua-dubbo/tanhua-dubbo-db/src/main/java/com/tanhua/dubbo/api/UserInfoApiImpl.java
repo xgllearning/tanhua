@@ -29,6 +29,7 @@ public class UserInfoApiImpl implements UserInfoApi {
      */
     @Override
     public UserInfo findById(Long userID) {
+
         return userInfoMapper.selectById(userID);
     }
 }

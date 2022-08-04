@@ -5,14 +5,14 @@ import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.vo.UserInfoVo;
-import org.apache.commons.beanutils.BeanUtils;
+
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+
 
 @Service
 public class UserInfoService {
@@ -68,17 +68,19 @@ public class UserInfoService {
     public UserInfoVo findById(Long userID) {
         UserInfo userInfo=userInfoApi.findById(userID);
         UserInfoVo vo = new UserInfoVo();
-        try {
-            BeanUtils.copyProperties(userInfo,vo); //copy同名同类型的属性
-            if(userInfo.getAge() != null) {
+        //import org.springframework.beans.BeanUtils;
+        BeanUtils.copyProperties(userInfo,vo);//copy同名同类型的属性
+        if(userInfo.getAge() != null) {
                 vo.setAge(userInfo.getAge().toString());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
         return vo;
+    }
+
+    /**
+     * 更新个人资料
+     * @param userInfo
+     */
+    public void update(UserInfo userInfo) {
+        userInfoApi.update(userInfo);
     }
 }

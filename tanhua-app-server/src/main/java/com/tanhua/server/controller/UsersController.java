@@ -7,10 +7,7 @@ import com.tanhua.server.service.UserInfoService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -46,5 +43,31 @@ public class UsersController {
         //4.根据userId进行查询
         UserInfoVo userInfo = userInfoService.findById(userID);
         return ResponseEntity.ok(userInfo);
+    }
+
+
+    /**更新个人资料
+     * 接口路径	/users
+     * 请求方式	PUT
+     * 请求header	Authorization
+     * 请求参数	UserInfo
+     * 响应结果	ResponseEntity
+     */
+    @PutMapping
+    public ResponseEntity users(@RequestHeader("Authorization") String token,@RequestBody UserInfo userInfo){
+        //1.解析token是否合法
+        boolean verifyToken = JwtUtils.verifyToken(token);
+        if (!verifyToken){//不合法抛出异常
+            return ResponseEntity.status(401).body(null);
+        }
+        //2. 获取token中的用户信息
+        Claims claims = JwtUtils.getClaims(token);
+        String id = claims.get("id").toString();
+        //3.userInfo中不携带id，因此使用解析token的id进行更新
+        userInfo.setId(Long.valueOf(id));
+        //调用userInfoService更新用户资料
+        userInfoService.update(userInfo);
+        return ResponseEntity.ok(null);
+
     }
 }
