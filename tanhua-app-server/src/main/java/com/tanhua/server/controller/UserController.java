@@ -25,11 +25,11 @@ public class UserController {
      */
     @PostMapping("/loginReginfo")
     public ResponseEntity loginReginfo(@RequestBody UserInfo userInfo, @RequestHeader("Authorization") String token){
-        //1.验证token是否合法，通过JwtUtils
-        boolean verifyToken = JwtUtils.verifyToken(token);
-        if (!verifyToken){//token不合法
-            return ResponseEntity.status(401).body(null);
-        }
+//        //1.验证token是否合法，通过JwtUtils
+//        boolean verifyToken = JwtUtils.verifyToken(token);
+//        if (!verifyToken){//token不合法
+//            return ResponseEntity.status(401).body(null);
+//        }
         //2.token合法则解析token，并拿到token中的用户id
         Claims claims = JwtUtils.getClaims(token);
         //String类型转Integer
@@ -51,11 +51,11 @@ public class UserController {
      */
     @PostMapping("/loginReginfo/head")
     public ResponseEntity updateUserInfo(MultipartFile headPhoto,@RequestHeader("Authorization") String token){
-        //1.验证token是否合法，通过JwtUtils
-        boolean verifyToken = JwtUtils.verifyToken(token);
-        if (!verifyToken){//token不合法
-            return ResponseEntity.status(401).body(null);
-        }
+//        //1.验证token是否合法，通过JwtUtils
+//        boolean verifyToken = JwtUtils.verifyToken(token);
+//        if (!verifyToken){//token不合法
+//            return ResponseEntity.status(401).body(null);
+//        }
         //2.token合法则解析token，并拿到token中的用户id
         Claims claims = JwtUtils.getClaims(token);
         //String类型转Integer

@@ -27,11 +27,11 @@ public class UsersController {
      */
     @GetMapping
     public ResponseEntity users(@RequestHeader("Authorization") String token,Long userID){
-        //1.解析token是否合法
-        boolean verifyToken = JwtUtils.verifyToken(token);
-        if (!verifyToken){//不合法抛出异常
-            return ResponseEntity.status(401).body(null);
-        }
+//        //1.解析token是否合法
+//        boolean verifyToken = JwtUtils.verifyToken(token);
+//        if (!verifyToken){//不合法抛出异常
+//            return ResponseEntity.status(401).body(null);
+//        }
         //2. 获取token中的用户信息
         Claims claims = JwtUtils.getClaims(token);
         String id = claims.get("id").toString();
@@ -56,10 +56,10 @@ public class UsersController {
     @PutMapping
     public ResponseEntity users(@RequestHeader("Authorization") String token,@RequestBody UserInfo userInfo){
         //1.解析token是否合法
-        boolean verifyToken = JwtUtils.verifyToken(token);
-        if (!verifyToken){//不合法抛出异常
-            return ResponseEntity.status(401).body(null);
-        }
+//        boolean verifyToken = JwtUtils.verifyToken(token);
+//        if (!verifyToken){//不合法抛出异常
+//            return ResponseEntity.status(401).body(null);
+//        }
         //2. 获取token中的用户信息
         Claims claims = JwtUtils.getClaims(token);
         String id = claims.get("id").toString();
