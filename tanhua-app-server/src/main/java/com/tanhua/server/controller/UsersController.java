@@ -9,6 +9,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
 
@@ -70,6 +71,16 @@ public class UsersController {
         userInfo.setId(id);
         //调用userInfoService更新用户资料
         userInfoService.update(userInfo);
+        return ResponseEntity.ok(null);
+
+    }
+
+    @PostMapping("/header")
+    public ResponseEntity header(@RequestHeader("Authorization") String token, MultipartFile headPhoto){
+        //获取当前用户id
+        Long userId = UserHolder.getUserId();
+        //根据用户id更新上传的图片
+        userInfoService.updateHead(headPhoto,userId);
         return ResponseEntity.ok(null);
 
     }

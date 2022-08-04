@@ -51,7 +51,7 @@ public class UserInfoService {
                 //设置id
                 //userInfo.setId(Long.valueOf(id));
                 userInfo.setId(id);
-                //设置头像链接地址
+                //设置头像链接地址(如果不管上传谁的头像都想设置为刘德华的，就放开下面的，即可把刘德华的图片地址存入数据库)
                 imageUrl="https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
                 userInfo.setAvatar(imageUrl);
                 userInfoApi.update(userInfo);

@@ -21,8 +21,8 @@ public class AipFaceTemplate {
         // 调用接口
         String imageType = "URL";
         //String image = "https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
-        String image = "https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
-        imageUrl="https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
+        //如果想将上传的imageUrl设置为刘德华头像进行人脸识别-则放开，此时传入的是刘德华照片
+        //imageUrl="https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
         HashMap<String, String> options = new HashMap<String, String>();
         options.put("face_field", "age");
         options.put("max_face_num", "2");
