@@ -3,6 +3,7 @@ package com.tanhua.server.controller;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.vo.UserInfoVo;
+import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.UserInfoService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,13 @@ public class UsersController {
 //            return ResponseEntity.status(401).body(null);
 //        }
         //2. 获取token中的用户信息
-        Claims claims = JwtUtils.getClaims(token);
-        String id = claims.get("id").toString();
+        //Claims claims = JwtUtils.getClaims(token);
+        //Integer id = (Integer) claims.get("id");
+
         //3.userID如果不为null,则根据userID进行查询，如果为null,则解析token，获取token携带的当前用户Id进行查询
         if (Objects.isNull(userID)){
             //为null,使用token携带的当前用户Id进行查询
-            userID = Long.valueOf(id);
+            userID = UserHolder.getUserId();
         }
         //4.根据userId进行查询
         UserInfoVo userInfo = userInfoService.findById(userID);
@@ -61,10 +63,11 @@ public class UsersController {
 //            return ResponseEntity.status(401).body(null);
 //        }
         //2. 获取token中的用户信息
-        Claims claims = JwtUtils.getClaims(token);
-        String id = claims.get("id").toString();
+//        Claims claims = JwtUtils.getClaims(token);
+//        String id = claims.get("id").toString();
         //3.userInfo中不携带id，因此使用解析token的id进行更新
-        userInfo.setId(Long.valueOf(id));
+        Long id = UserHolder.getUserId();
+        userInfo.setId(id);
         //调用userInfoService更新用户资料
         userInfoService.update(userInfo);
         return ResponseEntity.ok(null);

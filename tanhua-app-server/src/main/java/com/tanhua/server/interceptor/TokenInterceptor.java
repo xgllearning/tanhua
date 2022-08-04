@@ -2,6 +2,8 @@ package com.tanhua.server.interceptor;
 
 
 import com.tanhua.commons.utils.JwtUtils;
+import com.tanhua.model.domain.User;
+import io.jsonwebtoken.Claims;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +24,17 @@ public class TokenInterceptor implements HandlerInterceptor {
             return false;
         }
         //4.合法对请求放行
+        //4.1解析token,获取id和手机号码，构造user对象，存入ThreadLocal
+        Claims claims = JwtUtils.getClaims(token);
+        String mobile = (String) claims.get("phone");
+        Integer id = (Integer) claims.get("id");
 
+        User user = new User();
+        user.setId(Long.valueOf(id));
+        user.setMobile(mobile);
+        //存入ThreadLocal
+        UserHolder.set(user);
+        //由此可以省略解析的步骤
         return true;
     }
 }

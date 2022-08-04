@@ -2,6 +2,7 @@ package com.tanhua.server.controller;
 
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.UserInfoService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,12 @@ public class UserController {
 //        if (!verifyToken){//token不合法
 //            return ResponseEntity.status(401).body(null);
 //        }
-        //2.token合法则解析token，并拿到token中的用户id
-        Claims claims = JwtUtils.getClaims(token);
-        //String类型转Integer
-        Integer id = (Integer) claims.get("id");
+//        //2.token合法则解析token，并拿到token中的用户id
+//        Claims claims = JwtUtils.getClaims(token);
+//        //String类型转Integer
+//        Integer id = (Integer) claims.get("id");
+        //从ThreadLocal获取用户id
+        Long id = UserHolder.getUserId();
         //Integer转Long
         userInfo.setId(Long.valueOf(id));
         //3、调用service
@@ -56,10 +59,12 @@ public class UserController {
 //        if (!verifyToken){//token不合法
 //            return ResponseEntity.status(401).body(null);
 //        }
-        //2.token合法则解析token，并拿到token中的用户id
-        Claims claims = JwtUtils.getClaims(token);
-        //String类型转Integer
-        Integer id = (Integer) claims.get("id");
+//        //2.token合法则解析token，并拿到token中的用户id
+//        Claims claims = JwtUtils.getClaims(token);
+//        //String类型转Integer
+//        Integer id = (Integer) claims.get("id");
+        //从ThreadLocal获取用户id
+        Long id = UserHolder.getUserId();
         //根据用户id更新上传的图片
         userInfoService.updateHead(headPhoto,id);
         return ResponseEntity.ok(null);

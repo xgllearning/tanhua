@@ -32,7 +32,7 @@ public class UserInfoService {
         userInfoApi.save(userInfo);
     }
 
-    public void updateHead(MultipartFile headPhoto, Integer id) {
+    public void updateHead(MultipartFile headPhoto, Long id) {
 
         try {
             //1.根据headPhoto上传图片到阿里云,并返回图片url地址
@@ -46,7 +46,8 @@ public class UserInfoService {
                 //2.2包含人脸，调用Api更新
                 UserInfo userInfo = new UserInfo();
                 //设置id
-                userInfo.setId(Long.valueOf(id));
+                //userInfo.setId(Long.valueOf(id));
+                userInfo.setId(id);
                 //设置头像链接地址
                 imageUrl="https://tanhua001.oss-cn-beijing.aliyuncs.com/2021/04/19/a3824a45-70e3-4655-8106-a1e1be009a5e.jpg";
                 userInfo.setAvatar(imageUrl);
