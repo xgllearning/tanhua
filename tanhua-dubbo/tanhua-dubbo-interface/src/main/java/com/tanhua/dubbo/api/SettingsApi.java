@@ -9,4 +9,15 @@ public interface SettingsApi {
      * @return
      */
     Settings findByUserId(Long userId);
+
+    /**
+     * 通知设置--保存操作
+     * @param settings
+     */
+    void save(Settings settings);
+    /**
+     * 通知设置--更新操作
+     * @param settings
+     */
+    void update(Settings settings);
 }

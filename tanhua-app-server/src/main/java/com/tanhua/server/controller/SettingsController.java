@@ -43,4 +43,18 @@ public class SettingsController {
         settingsService.saveQuestion(content);
         return ResponseEntity.ok(null);
     }
+
+    /**通知设置
+     * 接口路径	/users/notifications/setting
+     * 请求方式	POST
+     * 参数	Settings
+     * 响应结果	ResponseEntity<void>
+     */
+    @PostMapping("/notifications/setting")
+    public ResponseEntity notifications(@RequestBody Map map){
+
+        //获取参数放到service层处理
+        settingsService.saveSettings(map);
+        return ResponseEntity.ok(null);
+    }
 }

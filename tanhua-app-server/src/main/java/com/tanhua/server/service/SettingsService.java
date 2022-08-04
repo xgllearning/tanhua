@@ -9,6 +9,7 @@ import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -65,5 +66,34 @@ public class SettingsService {
             questionApi.update(question);
         }
 
+    }
+
+    /**
+     * 通知设置
+     * @param map
+     */
+    public void saveSettings(Map map) {
+        //获取参数
+        boolean likeNotification = (Boolean) map.get("likeNotification");
+        boolean pinglunNotification = (Boolean) map.get("pinglunNotification");
+        boolean gonggaoNotification = (Boolean)  map.get("gonggaoNotification");
+        //获取当前用户id
+        Long userId = UserHolder.getUserId();
+        //根据当前用户id查询通知设置，调用settingsApi
+        Settings settings = settingsApi.findByUserId(userId);
+        //判断settings是否存在，存在则更新，不存在则插入
+        if(settings == null) {
+            //保存
+            settings.setUserId(userId);
+            settings.setPinglunNotification(pinglunNotification);
+            settings.setLikeNotification(likeNotification);
+            settings.setGonggaoNotification(gonggaoNotification);
+            settingsApi.save(settings);
+        }else {
+            settings.setPinglunNotification(pinglunNotification);
+            settings.setLikeNotification(likeNotification);
+            settings.setGonggaoNotification(gonggaoNotification);
+            settingsApi.update(settings);
+        }
     }
 }

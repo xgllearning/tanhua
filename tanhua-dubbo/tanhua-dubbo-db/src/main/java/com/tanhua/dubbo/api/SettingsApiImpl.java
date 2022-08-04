@@ -19,4 +19,21 @@ public class SettingsApiImpl implements SettingsApi{
         queryWrapper.eq(Settings::getUserId,userId);
         return settingsMapper.selectOne(queryWrapper);
     }
+    /**
+     * 通知设置--保存操作
+     * @param settings
+     */
+    @Override
+    public void save(Settings settings) {
+        settingsMapper.insert(settings);
+
+    }
+    /**
+     * 通知设置--更新操作
+     * @param settings
+     */
+    @Override
+    public void update(Settings settings) {
+        settingsMapper.updateById(settings);
+    }
 }
