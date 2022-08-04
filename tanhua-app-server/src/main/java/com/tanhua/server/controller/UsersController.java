@@ -2,6 +2,7 @@ package com.tanhua.server.controller;
 
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.vo.UserInfoVo;
 import com.tanhua.server.service.UserInfoService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class UsersController {
      * 响应结果	UserInfo
      */
     @GetMapping
-    public ResponseEntity<UserInfo> users(@RequestHeader("Authorization") String token,Long userID){
+    public ResponseEntity users(@RequestHeader("Authorization") String token,Long userID){
         //1.解析token是否合法
         boolean verifyToken = JwtUtils.verifyToken(token);
         if (!verifyToken){//不合法抛出异常
@@ -43,7 +44,7 @@ public class UsersController {
             userID = Long.valueOf(id);
         }
         //4.根据userId进行查询
-        UserInfo userInfo=userInfoService.findById(userID);
+        UserInfoVo userInfo = userInfoService.findById(userID);
         return ResponseEntity.ok(userInfo);
     }
 }
