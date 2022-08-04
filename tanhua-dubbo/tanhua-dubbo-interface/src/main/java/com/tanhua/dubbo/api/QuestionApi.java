@@ -9,4 +9,16 @@ public interface QuestionApi {
      * @return
      */
     Question findByUserId(Long userId);
+
+    /**
+     * 设置陌生人问题-保存问题
+     * @param question
+     */
+    void save(Question question);
+
+    /**
+     * 设置陌生人问题-更新问题
+     * @param question
+     */
+    void update(Question question);
 }

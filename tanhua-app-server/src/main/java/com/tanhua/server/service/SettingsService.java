@@ -42,4 +42,28 @@ public class SettingsService {
 
         return settingsVo;
     }
+
+    /**
+     * 设置陌生人问题
+     * @param content
+     */
+    public void saveQuestion(String content) {
+        //1.获取当前用户的id--UserHolder
+        Long userId = UserHolder.getUserId();
+        //2.调用questionApi，根据用户id查询当前用户的陌生人问题
+        Question question = questionApi.findByUserId(userId);
+        //3、判断问题是否存在
+        if (Objects.isNull(question)){
+            //3.1陌生人问题不存在则执行保存操作
+            question = new Question();
+            question.setUserId(userId);
+            question.setTxt(content);
+            questionApi.save(question);
+        }else {
+            //3.2 如果存在，更新
+            question.setTxt(content);
+            questionApi.update(question);
+        }
+
+    }
 }

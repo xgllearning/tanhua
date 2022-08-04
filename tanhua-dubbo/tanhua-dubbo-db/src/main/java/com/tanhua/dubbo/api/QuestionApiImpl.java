@@ -20,4 +20,21 @@ public class QuestionApiImpl implements QuestionApi{
         Question question = questionMapper.selectOne(queryWrapper);
         return question;
     }
+    /**
+     * 设置陌生人问题-保存问题
+     * @param question
+     */
+    @Override
+    public void save(Question question) {
+        questionMapper.insert(question);
+    }
+
+    /**
+     * 设置陌生人问题-更新问题
+     * @param question
+     */
+    @Override
+    public void update(Question question) {
+        questionMapper.updateById(question);
+    }
 }
