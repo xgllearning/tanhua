@@ -1,16 +1,21 @@
 package com.tanhua.server.controller;
 
 import com.tanhua.commons.utils.JwtUtils;
+import com.tanhua.model.domain.Settings;
+import com.tanhua.model.domain.UpdatePhone;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.vo.UserInfoVo;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.UserInfoService;
+import com.tanhua.server.service.UserService;
+import com.tanhua.server.service.UsersService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -20,6 +25,11 @@ public class UsersController {
     @Autowired
     private UserInfoService userInfoService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UsersService usersService;
 
     /**根据ID查询个人资料(详细信息)-参数userID： 用户id，当不传递时，查询当前用户的资料信息
      * 接口路径	/users
@@ -83,5 +93,47 @@ public class UsersController {
         userInfoService.updateHead(headPhoto,userId);
         return ResponseEntity.ok(null);
 
+    }
+
+
+    /**
+     *修改手机号- 1 发送短信验证码
+     * /users/phone/sendVerificationCode
+     */
+    @PostMapping("/phone/sendVerificationCode")
+    public ResponseEntity sendVerificationCode(){
+        //1.获取当前用户的手机号
+        String mobile = UserHolder.getMobile();
+        //2.调用userService发送短信验证码
+        return userService.sendMsg(mobile);
+    }
+
+    /**修改手机号 - 2 校验验证码
+     * /users/phone/checkVerificationCode
+     * 返回数据verification	boolean	是否验证通过
+     */
+    @PostMapping("/phone/checkVerificationCode")
+    public ResponseEntity checkVerificationCode(@RequestBody Map map){
+        //获取传递的body参数verificationCode验证码
+        String code = (String) map.get("verificationCode");
+        //调用UsersService验证验证码
+        Boolean verification = usersService.checkVerificationCode(code);
+        UpdatePhone updatePhone = new UpdatePhone();
+        updatePhone.setVerification(verification);
+        return ResponseEntity.ok(updatePhone);
+    }
+
+    /**
+     * 修改手机号 - 3 保存
+     * @param map
+     * @return
+     */
+    @PostMapping("/phone")
+    public ResponseEntity phone(@RequestBody Map map){
+        //获取传递的body参数verificationCode验证码
+        String mobile = (String) map.get("phone");
+        //修改tb_user表-mobile
+        usersService.update(mobile);
+        return ResponseEntity.ok(null);
     }
 }

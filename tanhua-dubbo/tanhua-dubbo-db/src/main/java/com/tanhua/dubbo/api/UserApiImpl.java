@@ -1,7 +1,6 @@
 package com.tanhua.dubbo.api;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.tanhua.dubbo.mappers.UserMapper;
 import com.tanhua.model.domain.User;
@@ -26,5 +25,13 @@ public class UserApiImpl implements UserApi{
     public Long save(User user) {
         userMapper.insert(user);
         return user.getId();
+    }
+    //修改手机号 - 3 保存
+    @Override
+    public void update(Long userId, String mobile) {
+        User user = new User();
+        user.setMobile(mobile);
+        user.setId(userId);
+        userMapper.updateById(user);
     }
 }

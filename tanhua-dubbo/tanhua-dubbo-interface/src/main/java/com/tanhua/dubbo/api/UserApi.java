@@ -7,4 +7,6 @@ public interface UserApi {
     public User findByMobile(String mobile);
     //保存用户
     Long save(User user);
+    //修改手机号 - 3 保存
+    void update(Long userId, String mobile);
 }
