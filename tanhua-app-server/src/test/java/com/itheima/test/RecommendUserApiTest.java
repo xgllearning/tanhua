@@ -1,7 +1,6 @@
 package com.itheima.test;
 
 import com.tanhua.dubbo.api.RecommendUserApi;
-import com.tanhua.model.domain.User;
 import com.tanhua.model.mongo.RecommendUser;
 import com.tanhua.server.AppServerApplication;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -19,7 +18,7 @@ public class RecommendUserApiTest {
 
     @Test
     public void testFindByMobile() {
-        RecommendUser recommendUser = recommendUserApi.queryWithMaxScore(106L);
+        RecommendUser recommendUser = recommendUserApi.queryWithMaxScore(106l);
         System.out.println(recommendUser);
     }
 
