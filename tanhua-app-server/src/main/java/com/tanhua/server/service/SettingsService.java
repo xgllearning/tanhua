@@ -125,4 +125,14 @@ public class SettingsService {
         return pr;
 
     }
+
+    /**移除黑名单用户--根据用户id和黑名单用户id
+     * @param blackUserId
+     */
+    public void deleteBlackList(Long blackUserId) {
+        //获取当前用户id
+        Long userId = UserHolder.getUserId();
+        //调用blackListApi的删除，根据blackUserId、userId删除
+        blackListApi.deleteBlackList(userId,blackUserId);
+    }
 }

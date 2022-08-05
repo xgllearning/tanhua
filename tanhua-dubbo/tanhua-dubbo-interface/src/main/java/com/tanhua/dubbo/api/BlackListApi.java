@@ -12,4 +12,11 @@ public interface BlackListApi {
      * @return
      */
     Page<UserInfo> findByUserId(Long userId, int page, int size);
+
+    /**
+     * 移除黑名单用户--根据用户id和黑名单用户id
+     * @param userId
+     * @param blackUserId
+     */
+    void deleteBlackList(Long userId, Long blackUserId);
 }

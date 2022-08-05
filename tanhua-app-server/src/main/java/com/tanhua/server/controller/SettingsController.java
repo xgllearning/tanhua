@@ -74,4 +74,18 @@ public class SettingsController {
         //2、构造返回
         return ResponseEntity.ok(pr);
     }
+
+    /**移除黑名单用户
+     * 接口路径	/users/blacklist/:uid
+     * 请求方式	DELETE
+     * 参数	uid(移除的黑名单id)
+     * 响应结果	ResponseResult<void>
+     */
+    @DeleteMapping("/blacklist/{uid}")
+    public ResponseEntity deleteBlackList(@PathVariable("uid") Long blackUserId){
+        //调用settingsService删除用户，根据黑名单用户id--blackUserId和用户id
+        settingsService.deleteBlackList(blackUserId);
+        return ResponseEntity.ok(null);
+    }
+
 }
