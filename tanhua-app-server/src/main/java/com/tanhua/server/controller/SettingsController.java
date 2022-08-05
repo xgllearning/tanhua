@@ -1,5 +1,7 @@
 package com.tanhua.server.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.SettingsVo;
 import com.tanhua.server.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +58,20 @@ public class SettingsController {
         //获取参数放到service层处理
         settingsService.saveSettings(map);
         return ResponseEntity.ok(null);
+    }
+
+    /**查询黑名单
+     * 接口路径	/users/blacklist
+     * 请求方式	GET
+     * 参数	page,size
+     * 响应结果	ResponseResult<PageResult>
+     */
+    @GetMapping("/blacklist")
+    public ResponseEntity blacklist( @RequestParam(defaultValue = "1") int page,
+                                     @RequestParam(defaultValue = "10") int size){
+        //1、调用settingsService查询
+        PageResult pr = settingsService.blacklist(page,size);
+        //2、构造返回
+        return ResponseEntity.ok(pr);
     }
 }

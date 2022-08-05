@@ -1,9 +1,14 @@
 package com.tanhua.server.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.tanhua.dubbo.api.BlackListApi;
 import com.tanhua.dubbo.api.QuestionApi;
 import com.tanhua.dubbo.api.SettingsApi;
 import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.Settings;
+import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.SettingsVo;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -20,6 +25,9 @@ public class SettingsService {
     //调用SettingsApi进行查询通知设置
     @DubboReference
     private SettingsApi settingsApi;
+
+    @DubboReference
+    private BlackListApi blackListApi;
 
     public SettingsVo settings() {
         //TODO:目的是封装settingsVo返回
@@ -95,5 +103,26 @@ public class SettingsService {
             settings.setGonggaoNotification(gonggaoNotification);
             settingsApi.update(settings);
         }
+    }
+
+    /**
+     * 查询黑名单用户详细信息
+     * @param page
+     * @param size
+     * @return
+     */
+    public PageResult blacklist(int page, int size) {
+
+        //获取当前用户id
+        Long userId = UserHolder.getUserId();
+        //根据用户id查询黑名单表，查询出黑名单用户id-调用blackListApi查询用户的黑名单分页列表  Ipage接口-实现类Page
+        //最后需要查询出黑名单用户的详细信息
+        Page<UserInfo> iPage=blackListApi.findByUserId(userId,page,size);
+        Integer total = Math.toIntExact(iPage.getTotal());
+        //3、对象转化，将查询的Ipage对象的内容封装到PageResult中，需要返回的对象是PageResult，查询出的数据是Page
+        PageResult pr = new PageResult(page,size,total,iPage.getRecords());
+        //4、返回
+        return pr;
+
     }
 }
