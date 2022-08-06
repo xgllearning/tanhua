@@ -1,12 +1,16 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+
+import java.util.List;
+
 @DubboService
 public class RecommendUserApiImpl implements RecommendUserApi{
 
@@ -27,5 +31,26 @@ public class RecommendUserApiImpl implements RecommendUserApi{
         //调用mongoTemplate的findOne查询方法
         RecommendUser recommendUser = mongoTemplate.findOne(query, RecommendUser.class);
         return recommendUser;
+    }
+    /**
+     * 推荐好友列表
+     * @param page
+     * @param pagesize
+     * @param toUserId
+     * @return
+     */
+    @Override
+    public PageResult queryRecommendUserList(Integer page, Integer pagesize, Long toUserId) {
+        //1.构建Criteria对象,查询条件
+        Criteria criteria = Criteria.where("toUserId").is(toUserId);
+        //2.构建query对象
+        Query query = Query.query(criteria);
+        //3.调用mongoTemplate查询总数(如果有查询条件,则先查总数再查数据列表,如果没有条件,可以共用一个query)
+        long count = mongoTemplate.count(query, RecommendUser.class);
+        //4.调用mongoTemplate查询数据列表
+        query.limit(pagesize).skip((page-1)*pagesize).with(Sort.by(Sort.Order.desc("score")));
+        List<RecommendUser> recommendUsers = mongoTemplate.find(query, RecommendUser.class);
+        //5.构造返回值
+        return new PageResult(page, pagesize,  Math.toIntExact(count), recommendUsers);
     }
 }
