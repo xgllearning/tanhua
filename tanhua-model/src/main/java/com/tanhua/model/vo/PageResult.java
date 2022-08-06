@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
+//封装返回给前端的分页数据
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -25,7 +25,7 @@ public class TodayBest {
     private Long fateValue; //缘分值
 
     /**
-     * 在vo对象中，补充一个工具方法，封装转化过程
+     * 在vo对象中，补充一个工具方法，封装转化过程，即把userInfo、recommendUser的属性都封装进TodayBest
      */
     public static TodayBest init(UserInfo userInfo, RecommendUser recommendUser) {
         TodayBest vo = new TodayBest();
