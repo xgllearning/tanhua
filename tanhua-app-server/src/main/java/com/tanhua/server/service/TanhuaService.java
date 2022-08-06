@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -65,6 +66,8 @@ public class TanhuaService {
         if (Objects.isNull(items)){
             return pageResult;
         }
+        //TODO：优化部分在UserInfoAPI中根据条件一次性查询所有用户列表详情，Service层进行数据筛选
+//        Map<Long,UserInfo> map=userInfoApi.findByIds(items,);
         //5.不为空则遍历数据列表，根据推荐用户Id(userId)去userInfoApi查询用户详细信息
         //5.1返回的PageResult中的items列表数据应该是TodayBest对象,此时为RecommendUser，需要进行替换
         List<TodayBest> list = new ArrayList<>();
