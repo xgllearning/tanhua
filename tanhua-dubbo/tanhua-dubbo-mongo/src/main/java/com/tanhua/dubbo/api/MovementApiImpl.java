@@ -1,6 +1,7 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.dubbo.utils.IdWorker;
+import com.tanhua.dubbo.utils.TimeLineService;
 import com.tanhua.model.mongo.Friend;
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.mongo.MovementTimeLine;
@@ -21,6 +22,8 @@ public class MovementApiImpl implements MovementApi{
     @Autowired
     private IdWorker idWorker;
 
+    @Autowired
+    private TimeLineService timeLineService;
     /**
      * 发布动态
      * @param movement
@@ -37,19 +40,21 @@ public class MovementApiImpl implements MovementApi{
             movement.setCreated(System.currentTimeMillis());
             //保存数据
             mongoTemplate.save(movement);
-            //2.查询好友表,查询当前用户的好友-返回List列表
-            Criteria criteria = Criteria.where("userId").is(movement.getUserId());
-            Query query = Query.query(criteria);
-            List<Friend> friends = mongoTemplate.find(query, Friend.class);
-            //循环好友数据，构建时间线数据存入数据库，根据好友id保存时间线表
-            for (Friend friend : friends) {
-                MovementTimeLine timeLine = new MovementTimeLine();
-                timeLine.setMovementId(movement.getId());
-                timeLine.setUserId(friend.getUserId());
-                timeLine.setFriendId(friend.getFriendId());
-                timeLine.setCreated(movement.getCreated());
-                mongoTemplate.save(timeLine);
-            }
+            timeLineService.saveTimeLine(movement.getUserId(),movement.getId(), movement.getCreated());
+            //TODO：抽取以下代码，异步执行，解决大量的时间线数据同步写入的问题
+//            //2.查询好友表,查询当前用户的好友-返回List列表
+//            Criteria criteria = Criteria.where("userId").is(movement.getUserId());
+//            Query query = Query.query(criteria);
+//            List<Friend> friends = mongoTemplate.find(query, Friend.class);
+//            //循环好友数据，构建时间线数据存入数据库，根据好友id保存时间线表
+//            for (Friend friend : friends) {
+//                MovementTimeLine timeLine = new MovementTimeLine();
+//                timeLine.setMovementId(movement.getId());
+//                timeLine.setUserId(friend.getUserId());
+//                timeLine.setFriendId(friend.getFriendId());
+//                timeLine.setCreated(movement.getCreated());
+//                mongoTemplate.save(timeLine);
+//            }
         } catch (Exception e) {
             //忽略事务处理
             e.printStackTrace();
