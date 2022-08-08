@@ -49,4 +49,22 @@ public class MovementController {
         PageResult pr = movementService.findByUserId(userId,page,pagesize);
         return ResponseEntity.ok(pr);
     }
+
+    /**查询当前用户的好友动态
+     * 接口路径	/movements
+     * 请求方式	GET
+     * 请求参数	page,pagesize
+     * 响应结果	ResponseEntity<PageResult>
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity movements(@RequestParam(defaultValue = "1") Integer page,
+                                       @RequestParam(defaultValue = "10") Integer pagesize) {
+        //查询好友动态
+        PageResult pr = movementService.findFriendMovements(page,pagesize);
+        return ResponseEntity.ok(pr);
+    }
+
 }
