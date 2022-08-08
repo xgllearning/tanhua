@@ -67,4 +67,17 @@ public class MovementController {
         return ResponseEntity.ok(pr);
     }
 
+    /**查询推荐动态
+     * 接口路径	/movements/recommend
+     * 请求方式	GET
+     * 请求参数	page,pagesize
+     * 响应结果	ResponseEntity<PageResult>
+     */
+    @GetMapping("/recommend")
+    public ResponseEntity recommend(@RequestParam(defaultValue = "1") Integer page,
+                                    @RequestParam(defaultValue = "10") Integer pagesize) {
+        //查询推荐动态
+        PageResult pr = movementService.findRecommendMovements(page,pagesize);
+        return ResponseEntity.ok(pr);
+    }
 }

@@ -12,6 +12,9 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -93,12 +96,44 @@ public class MovementApiImpl implements MovementApi {
     public List<Movement> findFriendMovements(Integer page, Integer pagesize, Long friendId) {
         //1.先查询时间线表,构造查询条件,查询出所有的好友动态
         Query query = Query.query(Criteria.where("friendId").is(friendId)).skip((page - 1) * pagesize).limit(pagesize)
-                .with(Sort.by(Sort.Order.desc("created")));
+                .with(Sort.by(Sort.Order.asc("created")));
         List<MovementTimeLine> timeLines = mongoTemplate.find(query, MovementTimeLine.class);
         //2.将查询出来的好友动态的动态id得到形成新集合
         List<ObjectId> movementsId = CollUtil.getFieldValues(timeLines, "movementId", ObjectId.class);
         //3.根据动态id从动态表中查询出动态详情Movement
         Query movementQuery = Query.query(Criteria.where("id").in(movementsId));
         return mongoTemplate.find(movementQuery, Movement.class);
+    }
+
+    /**
+     * 调用API随机构造10条动态数据
+     * MongoDB获取随机数
+     * Aggregation.sample()设置随机采样数
+     * aggregate()方法统计
+     * @param count
+     * @return
+     */
+    @Override
+    public List<Movement> randomMovements(Integer count) {
+        //MongoDB获取随机数
+        //1.创建统计对象，设置统计参数,参数一：操作哪个实体类就写哪个实体类的class,参数二：调用的统计方法
+        TypedAggregation<Movement> aggregation = Aggregation.newAggregation(Movement.class, Aggregation.sample(count));
+        //2.调用mongoTemplate方法统计，Movement.class目的是将结果设置到该对象中
+        AggregationResults<Movement> results = mongoTemplate.aggregate(aggregation, Movement.class);
+        //3.获取统计结果
+        List<Movement> mappedResults = results.getMappedResults();
+        return mappedResults;
+    }
+
+    /**
+     * 调用API根据PID数组查询动态数据
+     * @param pids
+     * @return
+     */
+    @Override
+    public List<Movement> findMovementsByPids(List<Long> pids) {
+        Query query = Query.query(Criteria.where("pid").in(pids));
+
+        return mongoTemplate.find(query,Movement.class);
     }
 }

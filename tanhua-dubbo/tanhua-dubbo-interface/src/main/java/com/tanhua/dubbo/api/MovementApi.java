@@ -31,4 +31,17 @@ public interface MovementApi {
      */
     List<Movement> findFriendMovements(Integer page, Integer pagesize, Long userId);
 
+    /**
+     * 调用API随机构造10条动态数据
+     * @param count
+     * @return
+     */
+    List<Movement> randomMovements(Integer count);
+
+    /**
+     * 调用API根据PID数组查询动态数据
+     * @param pids
+     * @return
+     */
+    List<Movement> findMovementsByPids(List<Long> pids);
 }
