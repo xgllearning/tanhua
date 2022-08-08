@@ -167,4 +167,22 @@ public class MovementService {
         PageResult pageResult = getPageResult(page, pagesize, list);
         return getPageResult(page,pagesize,list);
     }
+
+    /**
+     * 查看单条动态
+     * @param movementId
+     * @return
+     */
+    public MovementsVo findById(String movementId) {
+        //1、调用movementApi根据movementId查询动态详情
+        Movement movement = movementApi.findById(movementId);
+        //2、转化vo对象
+        if(movement != null) {
+            UserInfo userInfo = userInfoApi.findById(movement.getUserId());
+            return MovementsVo.init(userInfo,movement);
+        }else {
+            return null;
+        }
+
+    }
 }

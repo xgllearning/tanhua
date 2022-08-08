@@ -44,4 +44,6 @@ public interface MovementApi {
      * @return
      */
     List<Movement> findMovementsByPids(List<Long> pids);
+    //查看单条动态
+    Movement findById(String movementId);
 }

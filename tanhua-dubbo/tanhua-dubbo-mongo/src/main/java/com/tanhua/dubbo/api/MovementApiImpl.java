@@ -136,4 +136,9 @@ public class MovementApiImpl implements MovementApi {
 
         return mongoTemplate.find(query,Movement.class);
     }
+
+    @Override
+    public Movement findById(String movementId) {
+        return mongoTemplate.findById(movementId,Movement.class);
+    }
 }
