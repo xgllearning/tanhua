@@ -5,8 +5,10 @@ import com.tanhua.dubbo.utils.TimeLineService;
 import com.tanhua.model.mongo.Friend;
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.mongo.MovementTimeLine;
+import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -59,5 +61,22 @@ public class MovementApiImpl implements MovementApi{
             //忽略事务处理
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public PageResult findByUserId(Long userId, Integer page, Integer pagesize) {
+        //创建Criteria
+        Criteria criteria = Criteria.where("userId").is(userId);
+        //创建Query对象
+        Query query = Query.query(criteria);
+        //查询总记录数
+        long count = mongoTemplate.count(query, Movement.class);
+        //设置分页查询参数
+        query.skip((page -1 ) * pagesize).limit(pagesize)
+                .with(Sort.by(Sort.Order.desc("created")));
+        //查询分页数据列表
+        List<Movement> movements = mongoTemplate.find(query, Movement.class);
+        //构造返回值
+        return new PageResult(page,pagesize, Math.toIntExact(count),movements);
     }
 }
