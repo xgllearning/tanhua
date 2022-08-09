@@ -112,4 +112,31 @@ public class CommentService {
         return count;
 
     }
+
+    /**
+     * 取消点赞
+     * @param movementId
+     * @return
+     */
+    public Integer dislikeComment(String movementId) {
+        //1.查询该用户是否已对该动态点赞，从comment表中,需要参数:动态id,当前用户id,CommentType类型
+        Boolean hasComment=commentApi.hasComment(movementId,UserHolder.getUserId(),CommentType.LIKE);
+        //2.如果没有点赞，抛出自定义异常
+        if (!hasComment){
+            throw new BusinessException(ErrorResult.disLikeError());
+        }
+        //3.之前点过赞则调用api删除comment表中的数据,构造comment对象
+        Comment comment = new Comment();
+        comment.setPublishId(new ObjectId(movementId));//点赞的动态id
+        comment.setCommentType(CommentType.LIKE.getType());//类型
+        comment.setUserId(UserHolder.getUserId());//当前操作的人
+
+        //4.被publishUserI动态作者的id在api层封装，返回最新的点赞数量
+        Integer count = commentApi.delete(comment);
+        //5.拼接redis的key,将用户的点赞状态从redis中删除,采用hash，key  value(hashKey value)
+        String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;//唯一标识该动态，在该动态下可以有很多用户点赞
+        String hashKey = Constants.MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();//唯一标识该动态点赞的用户
+        redisTemplate.opsForHash().delete(key,hashKey);
+        return count;
+    }
 }

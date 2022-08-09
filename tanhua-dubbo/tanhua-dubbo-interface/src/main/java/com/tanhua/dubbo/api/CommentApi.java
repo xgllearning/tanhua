@@ -31,4 +31,11 @@ public interface CommentApi {
      * @return
      */
     Boolean hasComment(String movementId, Long userId, CommentType like);
+
+    /**
+     * 取消点赞
+     * @param comment
+     * @return
+     */
+    Integer delete(Comment comment);
 }

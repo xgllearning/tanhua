@@ -84,4 +84,36 @@ public class CommentApiImpl implements CommentApi{
         boolean exists = mongoTemplate.exists(query, Comment.class);
         return exists;////判断数据是否存在
     }
+
+    /**
+     * 取消点赞
+     * @param comment
+     * @return
+     */
+    public Integer delete(Comment comment) {
+        //1.根据movementId、userId定位到点赞数据，进而删除
+        Query query = Query.query(Criteria.where("publishId").is(comment.getPublishId())
+                .and("userId").is(comment.getUserId()).and("commentType").is(comment.getCommentType()));
+        mongoTemplate.remove(query,Comment.class);
+        //2.修改动态表中的数量-1
+        //3. findAndModify更新某个字段，并返回更新后的数值，参数一查询条件，参数二更新的字段和数值，参数三更新的设置属性，可以指定拿到更新后的结果，参数四：当前操作的字节码class
+        //根据动态id查询唯一的动态数据
+        Query movementQuery = Query.query(Criteria.where("id").is(comment.getPublishId()));
+        Update update = new Update();
+        if(comment.getCommentType() == CommentType.LIKE.getType()) {
+            update.inc("likeCount",-1);
+        }else if (comment.getCommentType() == CommentType.COMMENT.getType()){
+            update.inc("commentCount",-1);
+        }else {
+            update.inc("loveCount",-1);
+        }
+        //设置更新参数
+        FindAndModifyOptions options = new FindAndModifyOptions();
+        //获取更新后的最新数据
+        options.returnNew(true);
+        Movement modify = mongoTemplate.findAndModify(movementQuery, update, options, Movement.class);
+        //获取最新的评论数量或点赞数量或喜欢数量，并返回
+        return modify.statisCount(comment.getCommentType());
+
+    }
 }

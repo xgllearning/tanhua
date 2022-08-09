@@ -116,4 +116,19 @@ public class MovementController {
         Integer likeCount = commentService.likeComment(movementId);
         return ResponseEntity.ok(likeCount);
     }
+    /**
+     * 取消点赞
+     * 接口路径	/movements/:id/dislike
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<Integer>
+     * @param movementId
+     * @return
+     */
+    @GetMapping("/{id}/dislike")
+    public ResponseEntity dislike(@PathVariable("id") String movementId) {
+        Integer likeCount = commentService.dislikeComment(movementId);
+        return ResponseEntity.ok(likeCount);
+    }
+
 }
