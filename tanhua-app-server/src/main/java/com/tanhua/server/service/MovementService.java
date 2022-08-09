@@ -129,6 +129,13 @@ public class MovementService {
             UserInfo userInfo = map.get(movement.getUserId());
             if (userInfo !=null ){
                 MovementsVo vo = MovementsVo.init(userInfo, movement);
+                //修复查询好友动态时候的bug,对已经点过赞的动态到一直显示点赞状态
+                //对hasLiked进行封装
+                String key = Constants.MOVEMENTS_INTERACT_KEY+movement.getId().toHexString();
+                String hashKey = Constants.MOVEMENT_LIKE_HASHKEY+UserHolder.getUserId();
+                if (redisTemplate.opsForHash().hasKey(key,hashKey)){
+                    vo.setHasLiked(1);
+                }
                 vos.add(vo);
             }
         }
