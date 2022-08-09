@@ -1,12 +1,11 @@
 package com.tanhua.server.controller;
 
+import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -17,6 +16,24 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+
+
+
+    /**
+     * 分页查询评理列表
+     * @param page
+     * @param pagesize
+     * @param movementId
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity findComments(@RequestParam(defaultValue = "1") Integer page,
+                                       @RequestParam(defaultValue = "10") Integer pagesize,
+                                       String movementId) {
+        PageResult pr = commentService.findComments(movementId,page,pagesize);
+        return ResponseEntity.ok(pr);
+    }
+
     /**发布评论
      * 接口路径	/comments
      * 请求方式	POST
@@ -25,6 +42,7 @@ public class CommentController {
      * @param map
      * @return
      */
+    @PostMapping
     public ResponseEntity saveComments(@RequestBody Map map){
         //获取mao携带的参数movementId、comment评论内容
         String comment = (String) map.get("comment");

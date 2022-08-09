@@ -4,13 +4,16 @@ import com.tanhua.model.enums.CommentType;
 import com.tanhua.model.mongo.Comment;
 import com.tanhua.model.mongo.Movement;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.List;
 import java.util.Objects;
 
 @DubboService
@@ -48,5 +51,22 @@ public class CommentApiImpl implements CommentApi{
         Movement modify = mongoTemplate.findAndModify(query, update, options, Movement.class);
         //获取最新的评论数量，并返回
         return modify.statisCount(comment.getCommentType());
+    }
+
+    /**
+     * 分页查询评论列表
+     * @param movementId
+     * @param commentType
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    public List<Comment> findComments(String movementId, CommentType commentType, Integer page, Integer pagesize) {
+        //根据动态id(movementId)查询评论,publishId为ObjectId<--new ObjectId(movementId)
+        Query query = Query.query(Criteria.where("publishId").is(new ObjectId(movementId)).and("commentType").is(commentType.getType()))
+                .skip((page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
+        //2.查询并返回
+        List<Comment> list = mongoTemplate.find(query, Comment.class);
+        return list;
     }
 }
