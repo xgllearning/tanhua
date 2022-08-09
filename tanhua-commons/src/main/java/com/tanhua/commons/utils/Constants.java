@@ -1,7 +1,9 @@
 package com.tanhua.commons.utils;
 
+import java.io.Serializable;
+
 //常量定义
-public class Constants {
+public class Constants implements Serializable {
 
     //手机APP短信验证码CHECK_CODE_
     public static final String SMS_CODE = "CHECK_CODE_";

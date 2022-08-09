@@ -1,16 +1,21 @@
 package com.tanhua.server.service;
 
 import cn.hutool.core.collection.CollUtil;
+import com.tanhua.commons.utils.Constants;
 import com.tanhua.dubbo.api.CommentApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.enums.CommentType;
 import com.tanhua.model.mongo.Comment;
 import com.tanhua.model.vo.CommentVo;
+import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +24,9 @@ import java.util.Map;
 
 @Service
 public class CommentService {
+
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
 
     @DubboReference
     private CommentApi commentApi;
@@ -77,5 +85,31 @@ public class CommentService {
         Integer commentCount = commentApi.save(comment1);
     }
 
+    /**点赞
+     * comment中是根据commentType判断是点赞还是评论还是喜欢
+     * @param movementId
+     * @return
+     */
+    public Integer likeComment(String movementId) {
+        //1.查询该用户是否已对该动态点赞，从comment表中,需要参数:动态id,当前用户id,CommentType类型
+        Boolean hasComment=commentApi.hasComment(movementId,UserHolder.getUserId(),CommentType.LIKE);
+        //2.如果已经点赞，抛出自定义异常
+        if (hasComment){
+            throw new BusinessException(ErrorResult.likeError());
+        }
+        //3.之前没点过赞则调用api保持数据到mongodb的comment表中CommentType.like
+        Comment comment = new Comment();
+        comment.setPublishId(new ObjectId(movementId));//点赞的动态id
+        comment.setCommentType(CommentType.LIKE.getType());//类型
+        comment.setUserId(UserHolder.getUserId());//评论人
+        comment.setCreated(System.currentTimeMillis());
+        //4.被publishUserId评论人的id在api层封装，返回最新的点赞
+        Integer count = commentApi.save(comment);
+        //5.拼接redis的key,将用户的点赞状态存入到redis中,采用hash，key  value(hashKey value)
+        String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;//唯一标识该动态，在该动态下可以有很多用户点赞
+        String hashKey = Constants.MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();//唯一标识该动态点赞的用户
+        redisTemplate.opsForHash().put(key,hashKey,"1");
+        return count;
 
+    }
 }

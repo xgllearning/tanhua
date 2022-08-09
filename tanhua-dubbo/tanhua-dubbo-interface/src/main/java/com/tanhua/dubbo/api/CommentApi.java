@@ -22,4 +22,13 @@ public interface CommentApi {
      * @return
      */
     List<Comment> findComments(String movementId, CommentType comment, Integer page, Integer pagesize);
+
+    /**
+     * 判断comment数据是否存在,查询该用户是否已对该动态点赞
+     * @param movementId
+     * @param userId
+     * @param like
+     * @return
+     */
+    Boolean hasComment(String movementId, Long userId, CommentType like);
 }

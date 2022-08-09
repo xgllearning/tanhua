@@ -49,7 +49,7 @@ public class CommentApiImpl implements CommentApi{
         //获取更新后的最新数据
         options.returnNew(true);
         Movement modify = mongoTemplate.findAndModify(query, update, options, Movement.class);
-        //获取最新的评论数量，并返回
+        //获取最新的评论数量或点赞数量或喜欢数量，并返回
         return modify.statisCount(comment.getCommentType());
     }
 
@@ -68,5 +68,20 @@ public class CommentApiImpl implements CommentApi{
         //2.查询并返回
         List<Comment> list = mongoTemplate.find(query, Comment.class);
         return list;
+    }
+
+    /**
+     * 查询该用户是否已对该动态点赞
+     * @param movementId
+     * @param userId
+     * @param like
+     * @return
+     */
+    public Boolean hasComment(String movementId, Long userId, CommentType like) {
+        //根据movementId、userId查询是否点赞
+        Query query = Query.query(Criteria.where("publishId").is(new ObjectId(movementId))
+                .and("userId").is(userId).and("commentType").is(like.getType()));
+        boolean exists = mongoTemplate.exists(query, Comment.class);
+        return exists;////判断数据是否存在
     }
 }
