@@ -136,6 +136,11 @@ public class MovementService {
                 if (redisTemplate.opsForHash().hasKey(key,hashKey)){
                     vo.setHasLiked(1);
                 }
+                String loveKey = Constants.MOVEMENTS_INTERACT_KEY + movement.getId().toHexString();//唯一标识该动态，在该动态下可以有很多用户喜欢
+                String loveHashKey = Constants.MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();//唯一标识该动态喜欢的用户
+                if (redisTemplate.opsForHash().hasKey(key,hashKey)){
+                    vo.setHasLoved(1);
+                }
                 vos.add(vo);
             }
         }

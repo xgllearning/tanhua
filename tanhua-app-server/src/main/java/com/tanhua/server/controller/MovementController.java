@@ -131,4 +131,34 @@ public class MovementController {
         return ResponseEntity.ok(likeCount);
     }
 
+
+    /**
+     * 喜欢
+     * 接口路径	/movements/:id/love
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<Integer>
+     * @param movementId
+     * @return
+     */
+    @GetMapping("/{id}/love")
+    public ResponseEntity love(@PathVariable("id") String movementId) {
+        Integer likeCount = commentService.loveComment(movementId);
+        return ResponseEntity.ok(likeCount);
+    }
+    /**
+     * 取消喜欢
+     * 接口路径	/movements/:id/unlove
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<Integer>
+     * @param movementId
+     * @return
+     */
+    @GetMapping("/{id}/unlove")
+    public ResponseEntity unlove(@PathVariable("id") String movementId) {
+        Integer likeCount = commentService.unloveComment(movementId);
+        return ResponseEntity.ok(likeCount);
+    }
+
 }

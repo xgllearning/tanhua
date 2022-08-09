@@ -139,4 +139,59 @@ public class CommentService {
         redisTemplate.opsForHash().delete(key,hashKey);
         return count;
     }
+
+    /**
+     * 喜欢
+     * @param movementId
+     * @return
+     */
+    public Integer loveComment(String movementId) {
+        //1.查询该用户是否已对该动态喜欢，从comment表中,需要参数:动态id,当前用户id,CommentType类型
+        Boolean hasComment=commentApi.hasComment(movementId,UserHolder.getUserId(),CommentType.LOVE);
+        //2.如果已经喜欢，抛出自定义异常
+        if (hasComment){
+            throw new BusinessException(ErrorResult.loveError());
+        }
+        //3.之前没点喜欢则调用api保持数据到mongodb的comment表中CommentType.like
+        Comment comment = new Comment();
+        comment.setPublishId(new ObjectId(movementId));//喜欢的动态id
+        comment.setCommentType(CommentType.LOVE.getType());//类型
+        comment.setUserId(UserHolder.getUserId());//评论人
+        comment.setCreated(System.currentTimeMillis());
+        //4.被publishUserId评论人的id在api层封装，返回最新的喜欢
+        Integer count = commentApi.save(comment);
+        //5.拼接redis的key,将用户的喜欢状态存入到redis中,采用hash，key  value(hashKey value)
+        String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;//唯一标识该动态，在该动态下可以有很多用户喜欢
+        String hashKey = Constants.MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();//唯一标识该动态喜欢的用户
+        redisTemplate.opsForHash().put(key,hashKey,"1");
+        return count;
+
+    }
+
+    /**
+     * 取消喜欢
+     * @param movementId
+     * @return
+     */
+    public Integer unloveComment(String movementId) {
+        //1.查询该用户是否已对该动态喜欢，从comment表中,需要参数:动态id,当前用户id,CommentType类型
+        Boolean hasComment=commentApi.hasComment(movementId,UserHolder.getUserId(),CommentType.LOVE);
+        //2.如果没有喜欢，抛出自定义异常
+        if (!hasComment){
+            throw new BusinessException(ErrorResult.disloveError());
+        }
+        //3.之前点过喜欢则调用api删除comment表中的数据,构造comment对象
+        Comment comment = new Comment();
+        comment.setPublishId(new ObjectId(movementId));//喜欢的动态id
+        comment.setCommentType(CommentType.LOVE.getType());//类型
+        comment.setUserId(UserHolder.getUserId());//当前操作的人
+
+        //4.被publishUserI动态作者的id在api层封装，返回最新的喜欢数量
+        Integer count = commentApi.delete(comment);
+        //5.拼接redis的key,将用户的点赞状态从redis中删除,采用hash，key  value(hashKey value)
+        String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;//唯一标识该动态，在该动态下可以有很多用户喜欢
+        String hashKey = Constants.MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();//唯一标识该动态喜欢的用户
+        redisTemplate.opsForHash().delete(key,hashKey);
+        return count;
+    }
 }
