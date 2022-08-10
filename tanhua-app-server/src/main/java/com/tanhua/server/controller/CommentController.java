@@ -20,7 +20,7 @@ public class CommentController {
 
 
     /**
-     * 分页查询评理列表
+     * 分页查询评论列表
      * @param page
      * @param pagesize
      * @param movementId
@@ -52,4 +52,32 @@ public class CommentController {
         return ResponseEntity.ok(null);
     }
 
+    /**
+     * 评论点赞
+     * 接口路径	/comments/:id/like
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<Integer>
+     * @param commentId
+     * @return
+     */
+    @GetMapping("/{id}/like")
+    public ResponseEntity like(@PathVariable("id") String commentId) {
+        Integer likeCount = commentService.likeMovementComment(commentId);
+        return ResponseEntity.ok(likeCount);
+    }
+    /**
+     * 取消评论点赞
+     * 接口路径	/movements/:id/dislike
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<Integer>
+     * @param commentId
+     * @return
+     */
+    @GetMapping("/{id}/dislike")
+    public ResponseEntity dislike(@PathVariable("id") String commentId) {
+        Integer likeCount = commentService.dislikeMovementComment(commentId);
+        return ResponseEntity.ok(likeCount);
+    }
 }

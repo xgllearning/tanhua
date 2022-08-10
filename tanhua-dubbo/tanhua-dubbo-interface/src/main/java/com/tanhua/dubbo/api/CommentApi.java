@@ -38,4 +38,18 @@ public interface CommentApi {
      * @return
      */
     Integer delete(Comment comment);
+
+    /**
+     * 评论点赞
+     * @param comment
+     * @return
+     */
+    Integer saveComment(Comment comment);
+
+    /**
+     * 取消评论点赞
+     * @param comment
+     * @return
+     */
+    Integer deleteComment(Comment comment);
 }
