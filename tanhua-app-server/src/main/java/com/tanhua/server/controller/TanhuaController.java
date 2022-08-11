@@ -6,10 +6,9 @@ import com.tanhua.model.vo.TodayBest;
 import com.tanhua.server.service.TanhuaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tanhua")
@@ -66,4 +65,34 @@ public class TanhuaController {
         String question=tanhuaService.strangerQuestions(userId);
         return ResponseEntity.ok(question);
     }
+
+    /**好友申请（回复陌生人问题）
+     * 想办法给环信服务端发送的
+     * {
+     *      "userId":1,
+     *  	"huanXinId":“hx1",
+     *     "nickname":"黑马小妹",
+     *     "strangerQuestion":"你喜欢去看蔚蓝的大海还是去爬巍峨的高山？",
+     *     "reply":"我喜欢秋天的落叶，夏天的泉水，冬天的雪地，只要有你一切皆可~"
+     *  }
+     *  思路：可以放到一个对象或者map中，然后通过json转换的工具类转换为json发送即可
+     *  userId：当前操作用户的id，huanXinId：操作人的环信用户
+     * niciname：当前操作人昵称
+     * 接口路径	/tanhua/strangerQuestions
+     * 请求方式	POST
+     * 参数	Map
+     * 响应结果	ResponseEntity<void>
+     */
+    @PostMapping("/strangerQuestions")
+    public ResponseEntity replyQuestions(@RequestBody Map map) {
+        //1.前端传递的userId:是Integer类型的,注意Interger转的话需要先toString再转Long
+        // userId是对方陌生人id,reply是当前用户发送的信息
+        String userId = map.get("userId").toString();
+        Long toUserId = Long.valueOf(userId);
+        String reply = map.get("reply").toString();
+        //2.通过service处理逻辑，封装json对象发送个环信服务端
+        tanhuaService.replyQuestions(toUserId,reply);
+        return ResponseEntity.ok(null);
+    }
+
 }

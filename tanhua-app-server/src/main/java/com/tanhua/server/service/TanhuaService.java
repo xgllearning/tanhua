@@ -1,7 +1,9 @@
 package com.tanhua.server.service;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSON;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
+import com.tanhua.commons.utils.Constants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.QuestionApi;
 import com.tanhua.dubbo.api.RecommendUserApi;
@@ -10,18 +12,17 @@ import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.TodayBest;
+import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class TanhuaService {
@@ -175,5 +176,46 @@ public class TanhuaService {
         //如果question为null,则返回一个自定义数据
 
         return question==null?"添加我的理由！你喜欢我吗？":question.getTxt();
+    }
+
+    /**好友申请（回复陌生人问题）
+     * 想办法给环信服务端发送的
+     * {
+     *      "userId":1,
+     *  	"huanXinId":“hx1",
+     *     "nickname":"黑马小妹",
+     *     "strangerQuestion":"你喜欢去看蔚蓝的大海还是去爬巍峨的高山？",
+     *     "reply":"我喜欢秋天的落叶，夏天的泉水，冬天的雪地，只要有你一切皆可~"
+     *  }
+     *  思路：可以放到一个对象或者map中，然后通过json转换的工具类转换为json发送即可
+     *  userId：当前操作用户的id，huanXinId：操作人的环信用户
+     * niciname：当前操作人昵称
+     * 接口路径	/tanhua/strangerQuestions
+     * 请求方式	POST
+     * 参数	Map
+     * 响应结果	ResponseEntity<void>
+     */
+    public void replyQuestions(Long toUserId, String reply) {
+        //获取当前用户id--userId
+        Long userId = UserHolder.getUserId();
+        //组装环信id--huanXinId
+        String huanXinId = Constants.HX_USER_PREFIX + userId;
+        //根据用户id查询详细信息获取昵称-nickname
+        UserInfo userInfo = userInfoApi.findById(userId);
+        //通过map封装对象
+        Map map = new HashMap<>();
+        map.put("userId",userId);
+        map.put("huanXinId", huanXinId);
+        map.put("nickname",userInfo.getNickname());
+        //调用上面的方法得到陌生人问题
+        map.put("strangerQuestion",strangerQuestions(userId));
+        map.put("reply",reply);
+        //将map对象转为json发送到环信服务端
+        String json = JSON.toJSONString(map);
+        //2、调用template对象，发送消息，参数：接受方的环信id，2、消息
+        Boolean sendMsg = template.sendMsg(Constants.HX_USER_PREFIX + toUserId, json);
+        if(!sendMsg) {
+            throw  new BusinessException(ErrorResult.error());
+        }
     }
 }
