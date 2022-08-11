@@ -53,4 +53,17 @@ public class TanhuaController {
         TodayBest best = tanhuaService.personalInfo(userId);
         return ResponseEntity.ok(best);
     }
+
+
+    /**查看陌生人问题
+     * 接口路径	/tanhua/strangerQuestions
+     * 请求方式	GET
+     * 请求参数	userId
+     * 响应结果	ResponseEntity<String>
+     */
+    @GetMapping("/strangerQuestions")
+    public ResponseEntity strangerQuestions(Long userId) {
+        String question=tanhuaService.strangerQuestions(userId);
+        return ResponseEntity.ok(question);
+    }
 }

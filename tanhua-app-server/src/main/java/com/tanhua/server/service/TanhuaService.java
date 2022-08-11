@@ -6,6 +6,7 @@ import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.QuestionApi;
 import com.tanhua.dubbo.api.RecommendUserApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.mongo.RecommendUser;
@@ -35,6 +36,7 @@ public class TanhuaService {
 
     @DubboReference
     private QuestionApi questionApi;
+
 
     @Autowired
     private HuanXinTemplate template;
@@ -161,5 +163,17 @@ public class TanhuaService {
         //3.拼装返回值
         TodayBest todayBest = TodayBest.init(userInfo, recommendUser);
         return todayBest;
+    }
+
+    /**
+     * 查看陌生人问题
+     * @param userId
+     * @return
+     */
+    public String strangerQuestions(Long userId) {
+        Question question = questionApi.findByUserId(userId);
+        //如果question为null,则返回一个自定义数据
+
+        return question==null?"添加我的理由！你喜欢我吗？":question.getTxt();
     }
 }
