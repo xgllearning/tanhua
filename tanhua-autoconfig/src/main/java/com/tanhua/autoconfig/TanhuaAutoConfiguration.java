@@ -2,16 +2,18 @@ package com.tanhua.autoconfig;
 
 
 import com.tanhua.autoconfig.properties.AipFaceProperties;
+import com.tanhua.autoconfig.properties.HuanXinProperties;
 import com.tanhua.autoconfig.properties.OssProperties;
 import com.tanhua.autoconfig.properties.SmsProperties;
 import com.tanhua.autoconfig.template.AipFaceTemplate;
+import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.autoconfig.template.SmsTemplate;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 //会自动读取yml中的配置属性，接着把SmsProperties、OssTemplate、AipFaceTemplate对象存到容器
 @EnableConfigurationProperties({
-        SmsProperties.class,OssProperties.class, AipFaceProperties.class
+        SmsProperties.class,OssProperties.class, AipFaceProperties.class, HuanXinProperties.class
 })
 public class TanhuaAutoConfiguration {
     //定义自动装配类TanhuaAutoConfiguration，将smsTemplate交给ioc容器管理
@@ -30,4 +32,10 @@ public class TanhuaAutoConfiguration {
     public AipFaceTemplate aipFaceTemplate(){
         return new AipFaceTemplate();
     }
+
+    @Bean
+    public HuanXinTemplate huanXinTemplate(HuanXinProperties properties) {
+        return new HuanXinTemplate(properties);
+    }
+
 }
