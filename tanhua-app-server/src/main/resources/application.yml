@@ -34,3 +34,22 @@ tanhua:
     appId:
     apiKey:
     secretKey:
+#  huanxin:
+#    url:
+#    orgName:
+#    appName:
+#    clientId:
+#    clientSecret:
+  huanxin:
+    appkey:
+    clientId:
+    clientSecret:
+logging:
+  level:
+    com:
+      easemob:
+        im:
+          http=debug:
+          shaded:
+            io:
+              netty=error:

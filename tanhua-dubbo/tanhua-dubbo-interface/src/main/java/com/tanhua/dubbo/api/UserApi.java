@@ -9,4 +9,11 @@ public interface UserApi {
     Long save(User user);
     //修改手机号 - 3 保存
     void update(Long userId, String mobile);
+    //更新用户信息
+    void update(User user);
+    //通过id查询用户
+    User findById(Long userId);
+
+
+
 }

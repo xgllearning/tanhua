@@ -34,4 +34,25 @@ public class UserApiImpl implements UserApi{
         user.setId(userId);
         userMapper.updateById(user);
     }
+
+    /**
+     * 更新用户信息
+     * @param user
+     */
+    @Override
+    public void update(User user) {
+        userMapper.updateById(user);//10.0.2.2:18080
+    }
+
+    /**
+     * 通过id查询用户
+     * @param userId
+     * @return
+     */
+    @Override
+    public User findById(Long userId) {
+        User user = userMapper.selectById(userId);
+        return user;
+    }
+
 }

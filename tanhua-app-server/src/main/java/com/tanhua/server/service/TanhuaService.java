@@ -1,6 +1,9 @@
 package com.tanhua.server.service;
 
 import cn.hutool.core.collection.CollUtil;
+import com.tanhua.autoconfig.template.HuanXinTemplate;
+import com.tanhua.dubbo.api.MovementApi;
+import com.tanhua.dubbo.api.QuestionApi;
 import com.tanhua.dubbo.api.RecommendUserApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.model.domain.UserInfo;
@@ -11,6 +14,7 @@ import com.tanhua.model.vo.TodayBest;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,12 +25,22 @@ import java.util.Objects;
 @Service
 public class TanhuaService {
 
+
+
     @DubboReference
     private RecommendUserApi recommendUserApi;
 
     @DubboReference
     private UserInfoApi userInfoApi;
 
+    @DubboReference
+    private QuestionApi questionApi;
+
+    @Autowired
+    private HuanXinTemplate template;
+
+    @DubboReference
+    private MovementApi movementApi;
     /**
      * 查询当前用户今日佳人
      * @return
@@ -39,6 +53,7 @@ public class TanhuaService {
         //3.判断recommendUser是否为null
         if (Objects.isNull(recommendUser)){
             //3.1为null,设置默认数据
+            recommendUser = new RecommendUser();
             recommendUser.setUserId(1l);
             recommendUser.setScore(99d);
         }
@@ -64,7 +79,7 @@ public class TanhuaService {
         //3.获取PageResult中的recommendUser数据列表list<>
         List<RecommendUser> items = (List<RecommendUser>) pageResult.getItems();
         //4.判断列表是否为空,为空直接返回
-        if (Objects.isNull(items)){
+        if (items.size()==0){
             return pageResult;
         }
         //TODO：优化部分在UserInfoAPI中根据条件一次性查询所有用户列表详情，Service层进行数据筛选

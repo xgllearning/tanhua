@@ -1,6 +1,8 @@
 package com.tanhua.server.service;
 
+import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.autoconfig.template.SmsTemplate;
+import com.tanhua.commons.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
@@ -32,6 +34,9 @@ public class UserService {
 
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+
+    @Autowired
+    private HuanXinTemplate huanXinTemplate;
 
     @DubboReference
     private UserApi userApi;
@@ -79,10 +84,23 @@ public class UserService {
 //            user.setCreated(new Date());
 //            user.setUpdated(new Date());
             user.setPassword(DigestUtils.md5Hex("123456"));
+
             Long userId = userApi.save(user);
             user.setId(userId);
             //进入则为新用户,将isNew设为true
             isNew = true;
+
+            //当用户保存成功后，可以注册环信用户
+            //构造环信的用户名和密码，用户名需要字母和数字
+            String hxUser = "hx"+user.getId();
+            Boolean createUser = huanXinTemplate.createUser(hxUser, Constants.INIT_PASSWORD);
+            //判断环信用户是否注册成功，如果注册成功，将环信信息更新到数据库，即可与用户绑定在一起
+            if (createUser){
+                user.setHxUser(hxUser);
+                user.setHxPassword(Constants.INIT_PASSWORD);
+                userApi.update(user);
+            }
+
         }
         //6.通过JWT工具类生成token(根据id和phone生成)
         HashMap tokenMap = new HashMap<>();

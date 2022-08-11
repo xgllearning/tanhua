@@ -27,7 +27,7 @@ public class RecommendUserApiImpl implements RecommendUserApi{
         //构造查询条件，首先创建Criteria对象.where("数据库字段").is(传递参数)
         Criteria criteria=Criteria.where("toUserId").is(toUserId);
         //创建Query对象,传入criteria,并with排序
-        Query query = Query.query(criteria).with(Sort.by(Sort.Order.desc("score")));
+        Query query = Query.query(criteria).with(Sort.by(Sort.Order.desc("score"))).limit(1);//查询条数;
         //调用mongoTemplate的findOne查询方法
         RecommendUser recommendUser = mongoTemplate.findOne(query, RecommendUser.class);
         return recommendUser;
