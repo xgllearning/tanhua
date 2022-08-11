@@ -14,6 +14,6 @@ public interface UserApi {
     //通过id查询用户
     User findById(Long userId);
 
-
-
+    //根据环信ID查询用户详细信息
+    User findByHuanxin(String huanxinId);
 }

@@ -55,4 +55,17 @@ public class UserApiImpl implements UserApi{
         return user;
     }
 
+    /**
+     * 根据环信ID查询用户详细信息
+     * @param huanxinId
+     * @return
+     */
+    @Override
+    public User findByHuanxin(String huanxinId) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getHxUser,huanxinId);
+        User user = userMapper.selectOne(queryWrapper);
+        return user;
+    }
+
 }
