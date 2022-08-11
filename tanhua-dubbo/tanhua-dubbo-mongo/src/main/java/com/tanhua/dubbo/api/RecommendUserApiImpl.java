@@ -53,4 +53,27 @@ public class RecommendUserApiImpl implements RecommendUserApi{
         //5.构造返回值
         return new PageResult(page, pagesize,  Math.toIntExact(count), recommendUsers);
     }
+
+    /**
+     * 联系人管理-查询佳人详情信息
+     * @param userId
+     * @param toUserId
+     * @return
+     */
+    @Override
+    public RecommendUser queryByUserId(Long userId, Long toUserId) {
+        //1.通过mongoTemplate查询
+        Criteria criteria = Criteria.where("userId").is(userId).and("toUserId").is(toUserId);
+        Query query = Query.query(criteria);
+        RecommendUser recommendUser = mongoTemplate.findOne(query, RecommendUser.class);
+        //recommendUser可能查询不到，构建一个返回
+        if(recommendUser == null) {
+            recommendUser = new RecommendUser();
+            recommendUser.setUserId(userId);
+            recommendUser.setToUserId(toUserId);
+            //构建缘分值
+            recommendUser.setScore(95d);
+        }
+        return recommendUser;
+    }
 }

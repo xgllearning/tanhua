@@ -107,6 +107,8 @@ public class TanhuaService {
         //6.构造返回值
         return pageResult;
     }
+
+
 //    public PageResult recommendation(RecommendUserDto recommendUserDto) {
 //        //1.获取当前登录用户的id
 //        Long userId = UserHolder.getUserId();
@@ -147,4 +149,17 @@ public class TanhuaService {
 //        //6.构造返回值
 //        return pageResult;
 //    }
+
+    /**
+     * 联系人管理-查询佳人详情信息
+     */
+    public TodayBest personalInfo(Long userId) {
+        //1.目的是返回TodayBest,需要查询到用户详情表和mongoDB中的推荐表
+        UserInfo userInfo = userInfoApi.findById(userId);
+        //2.根据当前用户查看的用户id-userId,和当前用户id唯一确定recommend表数据
+        RecommendUser recommendUser=recommendUserApi.queryByUserId(userId,UserHolder.getUserId());
+        //3.拼装返回值
+        TodayBest todayBest = TodayBest.init(userInfo, recommendUser);
+        return todayBest;
+    }
 }

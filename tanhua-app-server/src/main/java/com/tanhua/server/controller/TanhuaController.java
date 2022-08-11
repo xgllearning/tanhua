@@ -7,6 +7,7 @@ import com.tanhua.server.service.TanhuaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +38,19 @@ public class TanhuaController {
         //带有分页的返回值vo对象是PageResult，只要是分页，统一返回PageResult,调用tanhuaService方法，传入接收的参数
         PageResult pageResult=tanhuaService.recommendation(recommendUserDto);
         return ResponseEntity.ok(pageResult);
+    }
+
+
+    /**
+     * 联系人管理-查询佳人详情信息
+     * 接口路径	/tanhua/:id/personalInfo
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<TodayBest>
+     */
+    @GetMapping("/{id}/personalInfo")
+    public ResponseEntity personalInfo(@PathVariable("id") Long userId) {
+        TodayBest best = tanhuaService.personalInfo(userId);
+        return ResponseEntity.ok(best);
     }
 }

@@ -16,4 +16,11 @@ public interface RecommendUserApi {
      */
     PageResult queryRecommendUserList(Integer page, Integer pagesize, Long toUserId);
 
+    /**
+     * 联系人管理-查询佳人详情信息
+     * @param userId
+     * @param toUserId
+     * @return
+     */
+    RecommendUser queryByUserId(Long userId, Long toUserId);
 }
