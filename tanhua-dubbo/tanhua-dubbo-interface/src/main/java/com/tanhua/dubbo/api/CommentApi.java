@@ -52,4 +52,14 @@ public interface CommentApi {
      * @return
      */
     Integer deleteComment(Comment comment);
+
+    /**
+     * 查询当前用户点赞列表数据
+     * @param userId
+     * @param like
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    List<Comment> findLikeComments(Long userId, CommentType like, Integer page, Integer pagesize);
 }

@@ -175,4 +175,21 @@ public class CommentApiImpl implements CommentApi{
         Integer likeCount = modify.getLikeCount();
         return likeCount;
     }
+
+    /**
+     * 查询当前用户点赞列表数据
+     * @param userId
+     * @param like
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    @Override
+    public List<Comment> findLikeComments(Long userId, CommentType like, Integer page, Integer pagesize) {
+
+        Criteria criteria = Criteria.where("publishUserId").is(userId).and("commentType").is(like.getType());
+        Query query = Query.query(criteria).skip((page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
+        List<Comment> comments = mongoTemplate.find(query, Comment.class);
+        return comments;
+    }
 }

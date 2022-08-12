@@ -60,4 +60,32 @@ public class MessagesController {
         return ResponseEntity.ok(pageResult);
     }
 
+
+    /**查询公告列表
+     * /messages/announcements
+     * page	是	1当前页数
+     * pagesize	是	10页尺寸
+     * 返回pageResult<>
+     * id	string	编号
+     * title	string	标题
+     * description	string	描述
+     * createDate	string	发布时间format: date-time
+     */
+    @GetMapping("/announcements")
+    public ResponseEntity announcements(@RequestParam(defaultValue = "1") Integer page,
+                                   @RequestParam(defaultValue = "10") Integer pagesize) {
+        PageResult pageResult = messagesService.findAnnouncements(page,pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
+
+
+    /**点赞列表
+     * /messages/likes
+     */
+    @GetMapping("/likes")
+    public ResponseEntity likes(@RequestParam(defaultValue = "1") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer pagesize) {
+        PageResult pageResult = messagesService.likes(page,pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
 }

@@ -3,16 +3,14 @@ package com.tanhua.server.service;
 import cn.hutool.core.collection.CollUtil;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.commons.utils.Constants;
-import com.tanhua.dubbo.api.FriendApi;
-import com.tanhua.dubbo.api.UserApi;
-import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.*;
+import com.tanhua.model.domain.Announcement;
 import com.tanhua.model.domain.User;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.enums.CommentType;
+import com.tanhua.model.mongo.Comment;
 import com.tanhua.model.mongo.Friend;
-import com.tanhua.model.vo.ContactVo;
-import com.tanhua.model.vo.ErrorResult;
-import com.tanhua.model.vo.PageResult;
-import com.tanhua.model.vo.UserInfoVo;
+import com.tanhua.model.vo.*;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -36,9 +34,14 @@ public class MessagesService {
     @DubboReference
     private FriendApi friendApi;
 
+    @DubboReference
+    private CommentApi commentApi;
+
     @Autowired
     private HuanXinTemplate huanXinTemplate;
 
+    @DubboReference
+    private AnnouncementsApi announcementsApi;
 
     /**
      * 根据环信ID查询用户详细信息
@@ -105,5 +108,49 @@ public class MessagesService {
             }
         }
         return new PageResult(page,pagesize, Math.toIntExact(0l),contactVos);
+    }
+
+    /**
+     * 查询公告列表
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    public PageResult findAnnouncements(Integer page, Integer pagesize) {
+        //通过AnnouncementsApi查询
+        List<Announcement> items=announcementsApi.find(page,pagesize);
+        if (CollUtil.isEmpty(items)){
+            return new PageResult();
+        }
+        return new PageResult(page,pagesize, Math.toIntExact(0l),items);
+    }
+
+    /**
+     *点赞列表
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    public PageResult likes(Integer page, Integer pagesize) {
+        //获取当前用户id
+        Long userId = UserHolder.getUserId();
+        //根据当前用户id,CommentType查询comment表查询出所有的点赞用户id
+        List<Comment> comments=commentApi.findLikeComments(userId,CommentType.LIKE,page,pagesize);
+        //如果查询为空则直接返回一个空的pageResult
+        if (CollUtil.isEmpty(comments)){
+            return new PageResult();
+        }
+        //根据查询出来的点赞用户id，查询对应的用户详细信息
+        List<Long> ids = CollUtil.getFieldValues(comments, "userId", Long.class);
+        Map<Long, UserInfo> map = userInfoApi.findByIds(ids,null);
+        //将每一个点赞数据封装成commentVo对象返回
+        List<CommentVo> vos = new ArrayList<>();
+        for (Comment comment : comments) {
+            UserInfo userInfo = map.get(comment.getUserId());
+            CommentVo vo = CommentVo.init(userInfo, comment);
+            vos.add(vo);
+        }
+
+        return new PageResult(page,pagesize, Math.toIntExact(0l),vos);
     }
 }
