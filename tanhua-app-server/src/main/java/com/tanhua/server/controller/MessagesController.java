@@ -1,5 +1,6 @@
 package com.tanhua.server.controller;
 
+import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.UserInfoVo;
 import com.tanhua.server.service.MessagesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,20 @@ public class MessagesController {
         messagesService.contacts(friendId);
 
         return ResponseEntity.ok(null);
+    }
+
+    /**分页查询联系人列表
+     * 接口路径	/messages/contacts
+     * 请求方式	GET
+     * 请求参数	page,pagesize,keywork
+     * 响应结果	PageResult<ContactVo>
+     */
+    @GetMapping("/contacts")
+    public ResponseEntity contacts(@RequestParam(defaultValue = "1") Integer page,
+                                   @RequestParam(defaultValue = "10") Integer pagesize,
+                                   String keyword) {
+        PageResult pageResult = messagesService.findFrends(page,pagesize,keyword);
+        return ResponseEntity.ok(pageResult);
     }
 
 }

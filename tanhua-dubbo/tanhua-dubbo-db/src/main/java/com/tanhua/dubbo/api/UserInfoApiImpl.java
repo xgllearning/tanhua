@@ -56,9 +56,9 @@ public class UserInfoApiImpl implements UserInfoApi {
             if(!StringUtils.isEmpty(userInfo.getGender())) {//根据性别
                 queryWrapper.eq(UserInfo::getGender,userInfo.getGender());
             }
-//            if(!StringUtils.isEmpty(userInfo.getNickname())) {//名字模糊搜索
-//                queryWrapper.like(UserInfo::getNickname,userInfo.getNickname());
-//            }
+            if(!StringUtils.isEmpty(userInfo.getNickname())) {//名字模糊搜索
+                queryWrapper.like(UserInfo::getNickname,userInfo.getNickname());
+            }
         }
         //查询返回所有符合条件的用户详情
         List<UserInfo> infoList = userInfoMapper.selectList(queryWrapper);

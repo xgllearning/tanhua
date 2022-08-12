@@ -4,9 +4,12 @@ import com.tanhua.model.mongo.Friend;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+
+import java.util.List;
 
 @DubboService
 public class FriendApiImpl implements FriendApi{
@@ -45,5 +48,17 @@ public class FriendApiImpl implements FriendApi{
             friend.setCreated(System.currentTimeMillis());
             mongoTemplate.save(friend);
         }
+    }
+    /**
+     * 分页查询联系人列表
+     */
+    @Override
+    public List<Friend> findByUserId(Long userId, Integer page, Integer pagesize) {
+        //使用userId查询mongodb中的friend表
+        Query query = Query.query(Criteria.where("userId").is(userId)).skip((page - 1) * pagesize).limit(pagesize)
+                .with(Sort.by(Sort.Order.desc("created")));
+        List<Friend> friends = mongoTemplate.find(query, Friend.class);
+
+        return friends;
     }
 }
