@@ -110,4 +110,32 @@ public class TanhuaController {
         return ResponseEntity.ok(list);
     }
 
+
+    /**喜欢处理
+     * 接口路径	/tanhua/:id/love
+     * 请求方式	GET
+     * 路径参数	:id
+     * 响应结果	ResponseEntity<Void>
+     *     传递的是喜欢的用户id
+     */
+    @GetMapping("/{id}/love")
+    public ResponseEntity likeUser(@PathVariable("id") Long likeUserId) {
+        this.tanhuaService.likeUser(likeUserId);
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 不喜欢
+     */
+    @GetMapping("{id}/unlove")
+    public ResponseEntity<Void> notLikeUser(@PathVariable("id") Long likeUserId) {
+        this.tanhuaService.notLikeUser(likeUserId);
+        return ResponseEntity.ok(null);
+    }
+
+
+
+
+
+
 }

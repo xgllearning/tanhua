@@ -6,10 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.commons.utils.Constants;
-import com.tanhua.dubbo.api.MovementApi;
-import com.tanhua.dubbo.api.QuestionApi;
-import com.tanhua.dubbo.api.RecommendUserApi;
-import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.*;
 import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
@@ -23,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,6 +45,15 @@ public class TanhuaService {
 
     @DubboReference
     private MovementApi movementApi;
+
+    @DubboReference
+    private UserLikeApi userLikeApi;
+
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
+
+    @Autowired
+    private MessagesService messagesService;
 
     @Value("${tanhua.default.recommend.users}")//注入配置信息
     private String recommendUser;
@@ -263,5 +270,52 @@ public class TanhuaService {
         }
 
         return vos;
+    }
+
+    /**
+     * 左滑右滑--喜欢处理
+     * @param likeUserId
+     */
+    public void likeUser(Long likeUserId) {
+        //1.调用userLikeApi保存喜欢数据，如果存在数据则更新，不存在则保存,根据当前用户id和喜欢用户的id唯一确定一条数据
+        Boolean save=userLikeApi.saveOrUpdate(UserHolder.getUserId(),likeUserId,true);
+        if (!save){//如果保存失败则抛出自定义异常
+            throw new BusinessException(ErrorResult.error());
+        }
+        //2.操作成功，操作redis,写入喜欢的数据，删除不喜欢的数据(喜欢的集合和不喜欢的集合)，redis中有自己的处理机制，直接删除即可，不会报错，会返回删除了几条数据
+        redisTemplate.opsForSet().remove(Constants.USER_NOT_LIKE_KEY+UserHolder.getUserId(),likeUserId.toString());//删除当前用户不喜欢该用户的redis缓存
+        redisTemplate.opsForSet().add(Constants.USER_LIKE_KEY+UserHolder.getUserId(),likeUserId.toString());//保存该用户id为喜欢用户
+        //3.判断是否是双向喜欢，查询redis中对方的喜欢集合中有没有该用户的id
+        if (isLike(likeUserId,UserHolder.getUserId())){
+            //说明双向喜欢，则添加好友
+            messagesService.contacts(likeUserId);
+        }
+
+    }
+
+    //定义一个公共方法，用户判断是不是喜欢,即判断在redis中，该用户的值中是否有喜欢的用户id
+    public Boolean isLike(Long userId,Long likeUserId){
+        String key = Constants.USER_LIKE_KEY+userId;
+        //判断某个数据是否在集合中
+        return redisTemplate.opsForSet().isMember(key,likeUserId.toString());
+    }
+
+    //不喜欢处理
+    public void notLikeUser(Long likeUserId) {
+        //1.调用userLikeApi保存不喜欢数据，如果存在数据则更新，不存在则保存,根据当前用户id和喜欢用户的id唯一确定一条数据
+        Boolean save=userLikeApi.saveOrUpdate(UserHolder.getUserId(),likeUserId,false);
+        if (!save){//如果保存失败则抛出自定义异常
+            throw new BusinessException(ErrorResult.error());
+        }
+        //2.操作成功，操作redis,写入喜欢的数据，删除不喜欢的数据(喜欢的集合和不喜欢的集合)，redis中有自己的处理机制，直接删除即可，不会报错，会返回删除了几条数据
+        redisTemplate.opsForSet().remove(Constants.USER_LIKE_KEY+UserHolder.getUserId(),likeUserId.toString());//删除当前用户不喜欢该用户的redis缓存
+        redisTemplate.opsForSet().add(Constants.USER_NOT_LIKE_KEY+UserHolder.getUserId(),likeUserId.toString());//保存该用户id为喜欢用户
+//        //3.判断是否是双向喜欢，查询redis中对方的喜欢集合中有没有该用户的id
+//        if (isLike(likeUserId,UserHolder.getUserId())){
+//            //说明双向喜欢，则添加好友
+//            messagesService.contacts(likeUserId);
+//        }
+        //不喜欢则删除好友关系,删除环信好友关系,删除好友表中的数据，
+        //template.deleteContact(Constants.HX_USER_PREFIX+UserHolder.getUserId(),Constants.HX_USER_PREFIX+likeUserId);
     }
 }
