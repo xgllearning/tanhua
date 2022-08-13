@@ -2,4 +2,4 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://192.168.136.160:27017/testdb
+      uri: mongodb://192.168.136.160:27017/geo-test
