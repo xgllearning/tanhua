@@ -12,6 +12,7 @@ import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.mongo.RecommendUser;
 import com.tanhua.model.vo.ErrorResult;
+import com.tanhua.model.vo.NearUserVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.TodayBest;
 import com.tanhua.server.exception.BusinessException;
@@ -54,6 +55,9 @@ public class TanhuaService {
 
     @Autowired
     private MessagesService messagesService;
+
+    @DubboReference
+    private UserLocationApi userLocationApi;
 
     @Value("${tanhua.default.recommend.users}")//注入配置信息
     private String recommendUser;
@@ -317,5 +321,37 @@ public class TanhuaService {
 //        }
         //不喜欢则删除好友关系,删除环信好友关系,删除好友表中的数据，
         //template.deleteContact(Constants.HX_USER_PREFIX+UserHolder.getUserId(),Constants.HX_USER_PREFIX+likeUserId);
+    }
+
+    /**
+     * 搜索附近用户，返回NearUserVo集合
+     * @param gender
+     * @param distance
+     * @return
+     */
+    public List<NearUserVo> queryNearUser(String gender, String distance) {
+        //NearUserVo init(UserInfo userInfo)
+        //1.查询user_Location表，根据当前用户id查询出在范围内的所有用户id,此时包含当前用户id
+        List<Long> userIds = userLocationApi.queryNearUser(UserHolder.getUserId(),gender,distance);
+        //2.如果没有查询出id,说明没有用户信息，或者没开启定位，返回null
+        if (CollUtil.isEmpty(userIds)){
+            return new ArrayList<>();
+        }
+        //3.如果查询出id，则需要查询id的用户信息
+        Map<Long, UserInfo> infoMap = userInfoApi.findByIds(userIds, null);
+        //4.封装返回的对象,一个id就是一个NearUserVo对象
+        List<NearUserVo> vos = new ArrayList<>();
+        for (Long userId : userIds) {
+            //排除当前用户
+            if (userId==UserHolder.getUserId()){
+                continue;
+            }
+            UserInfo userInfo = infoMap.get(userId);
+            if(userInfo != null) {
+                NearUserVo vo = NearUserVo.init(userInfo);
+                vos.add(vo);
+            }
+        }
+        return vos;
     }
 }
