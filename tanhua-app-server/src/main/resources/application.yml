@@ -19,6 +19,10 @@ dubbo:
     check: false
 #目标是让该模块读取到配置信息
 tanhua:
+#默认推荐列表
+  default:
+    recommend:
+      users: 2,3,8,10,18,20,24,29,27,32,36,37,56,64,75,88
   sms:
     signName:
     templateCode:

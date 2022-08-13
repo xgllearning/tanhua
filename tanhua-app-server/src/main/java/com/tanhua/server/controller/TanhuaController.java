@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -93,6 +94,20 @@ public class TanhuaController {
         //2.通过service处理逻辑，封装json对象发送个环信服务端
         tanhuaService.replyQuestions(toUserId,reply);
         return ResponseEntity.ok(null);
+    }
+
+
+    /**
+     * 探花-推荐用户列表
+     * 接口路径	/tanhua/cards
+     * 请求方式	GET
+     * 响应结果	ResponseEntity<TodayBest[]>
+     */
+    @GetMapping("/cards")
+    public ResponseEntity queryCardsList() {
+        //返回TodayBest[]数组，即集合
+        List<TodayBest> list = this.tanhuaService.queryCardsList();
+        return ResponseEntity.ok(list);
     }
 
 }

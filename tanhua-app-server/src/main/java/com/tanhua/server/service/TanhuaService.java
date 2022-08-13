@@ -1,6 +1,8 @@
 package com.tanhua.server.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.commons.utils.Constants;
@@ -20,6 +22,7 @@ import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -44,6 +47,9 @@ public class TanhuaService {
 
     @DubboReference
     private MovementApi movementApi;
+
+    @Value("${tanhua.default.recommend.users}")//注入配置信息
+    private String recommendUser;
     /**
      * 查询当前用户今日佳人
      * @return
@@ -217,5 +223,45 @@ public class TanhuaService {
         if(!sendMsg) {
             throw  new BusinessException(ErrorResult.error());
         }
+    }
+
+    /**
+     * 查询推荐用户列表
+     * @return
+     */
+    public List<TodayBest> queryCardsList() {
+        //1.获取当前用户id
+        Long userId = UserHolder.getUserId();
+        //2.调用api查询推荐数据列表-(排除喜欢和不喜欢的用户，并设置显示数量)--
+        //推荐表中当前用户id即toUserId,推荐用户id--userId，而like表中当前用户id代表的是userId，
+        List<RecommendUser> users=recommendUserApi.queryCardsList(userId,10);
+        //2.1如果数据不存在，则构造数据返回
+        if(CollUtil.isEmpty(users)){
+            users=new ArrayList<>();
+            //构造推荐用户id数据
+            String[] userIds = recommendUser.split(",");
+            //遍历推荐用户id,封装到RecommendUser中
+            for (String id : userIds) {
+                RecommendUser recommendUser = new RecommendUser();
+                recommendUser.setUserId(Convert.toLong(id));
+                recommendUser.setToUserId(userId);
+                recommendUser.setScore(RandomUtil.randomDouble(60, 90));
+                users.add(recommendUser);
+            }
+
+        }
+        //3.此时说明查询出推荐用户数据,需要查询推荐用户的详细信息,先CollUtil得到推荐用户的id
+        List<Long> ids = CollUtil.getFieldValues(users, "userId", Long.class);
+        Map<Long, UserInfo> map = userInfoApi.findByIds(ids, null);
+        ArrayList<TodayBest> vos = new ArrayList<>();
+        for (RecommendUser user : users) {
+            UserInfo userInfo = map.get(user.getUserId());
+            if (userInfo!=null){
+                TodayBest vo = TodayBest.init(userInfo, user);
+                vos.add(vo);
+            }
+        }
+
+        return vos;
     }
 }
