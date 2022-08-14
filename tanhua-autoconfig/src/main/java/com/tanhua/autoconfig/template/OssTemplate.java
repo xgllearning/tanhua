@@ -77,8 +77,9 @@ public class OssTemplate {
                 ossClient.shutdown();
 //                String url = "https://tanhua340.oss-cn-beijing.aliyuncs.com/" + filename;
                 url = ossProperties.getUrl()+"/" + filename;
+                //直接设置死图片
+                url="https://tanhua001.oss-cn-beijing.aliyuncs.com//2021/05/07/cd212b26-47c8-4058-af77-77e12a549e32.jpg";
                 System.out.println(url);
-
             }
         }
         return url;

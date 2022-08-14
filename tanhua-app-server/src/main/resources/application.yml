@@ -65,6 +65,12 @@ fdfs:
   thumb-image:
     width: 150
     height: 150
-  #TrackerList参数,支持多个，客户端访问首先访问tracker,访问到之后进行文件上传，上传完成要进行浏览器http访问，再拿nginx地址拼接，nginx地址+上传完成返回的地址=访问地址
+  #TrackerList参数,支持多个，客户端访问首先访问tracker,访问到之后进行文件上传,上传完成要进行浏览器http访问，再拿nginx地址拼接，nginx地址+上传完成返回的地址=访问地址
   tracker-list: 192.168.136.160:22122
   web-server-url: http://192.168.136.160:8888/
+  #配置文件上传的大小
+Spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
