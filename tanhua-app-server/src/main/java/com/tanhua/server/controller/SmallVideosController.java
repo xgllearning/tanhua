@@ -28,4 +28,14 @@ public class SmallVideosController {
         videosService.saveVideos(videoThumbnail,videoFile);
         return ResponseEntity.ok(null);
     }
+
+    /**
+     * 视频列表
+     */
+    @GetMapping
+    public ResponseEntity queryVideoList(@RequestParam(defaultValue = "1")  Integer page,
+                                         @RequestParam(defaultValue = "10") Integer pagesize) {
+        PageResult result = videosService.queryVideoList(page, pagesize);
+        return ResponseEntity.ok(result);
+    }
 }
