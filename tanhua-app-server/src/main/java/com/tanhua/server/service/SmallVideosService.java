@@ -93,7 +93,7 @@ public class SmallVideosService {
         String redisKey= Constants.VIDEOS_RECOMMEND+UserHolder.getUserId();
         String redisValue = redisTemplate.opsForValue().get(redisKey);
         //2.判断redis中是否为空，如果不为空则通过redis中的vid查询数据
-        ArrayList<Video> videos = new ArrayList<>();
+        List<Video> videos = new ArrayList<>();
         int redisPages=0;//标记redis处理的页码
         if (!StringUtils.isEmpty(redisValue)){
             //3.不为空，切割redis中数据
@@ -110,7 +110,7 @@ public class SmallVideosService {
         //6.如果redis中数据不存在，则直接分页查询video表视频数据
         //7.可能页码在第二页，但是redis数据只有一页，此时redis数据不为空，但是进行了越界处理，此时videos集合为空
         if (videos.isEmpty()){//处理越界问题+redis为空问题，查询video表，根据页码和条数查询
-            //page计算规则，传入页码-redis查询的总页数
+            //page计算规则，传入页码-redis查询的总页数，根据创建时间排序
             videos=videoApi.queryVideoList((page-redisPages),pagesize);
         }
         //8.提取视频列表中所有的用户id
