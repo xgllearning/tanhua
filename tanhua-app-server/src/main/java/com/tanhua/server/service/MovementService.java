@@ -5,11 +5,14 @@ import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.commons.utils.Constants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.VisitorsApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.mongo.Visitors;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +41,9 @@ public class MovementService {
 
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+
+    @DubboReference
+    private VisitorsApi visitorsApi;
 
     /**
      * 发布动态，imageContet-可以携带多张文件，采用数组
@@ -195,6 +201,46 @@ public class MovementService {
         }else {
             return null;
         }
+
+    }
+
+    /**
+     * 谁看过我
+     * @return
+     */
+    public List<VisitorsVo> queryVisitorsList() {
+        //1.操作的是visitors表,每次查看的时候，需要把当前时间传入redis中，下次再次查看的时候，只显示上次查询时间之后的访客数据
+        String key= Constants.VISITORS_USER;
+        String hashKey=String.valueOf(UserHolder.getUserId());
+        //2.从redis中获取最新的时间
+        String value = (String) redisTemplate.opsForHash().get(key, hashKey);
+        //3.判断是否为空，为空则设为null
+        Long date = StringUtils.isEmpty(value) ? null:Long.valueOf(value);
+        //4、调用visitorsApi查询数据列表，返回访客记录 List<Visitors>
+        List<Visitors> list =  visitorsApi.queryMyVisitors(date,UserHolder.getUserId());
+        if(CollUtil.isEmpty(list)) {//如果是新用户，可能没有访客，所以也需要返回空的集合，如果返回null,前台会对null处理
+            return new ArrayList<>();
+        }
+        //3、提取用户的id
+        List<Long> userIds = CollUtil.getFieldValues(list, "visitorUserId", Long.class);
+        //4、查看用户详情
+        Map<Long, UserInfo> map = userInfoApi.findByIds(userIds, null);
+        //5、构造返回
+        List<VisitorsVo> vos = new ArrayList<>();
+        for (Visitors visitors : list) {
+            UserInfo userInfo = map.get(visitors.getVisitorUserId());
+            if(userInfo != null) {
+                VisitorsVo vo = VisitorsVo.init(userInfo, visitors);
+                vos.add(vo);
+            }
+        }
+        //执行完成后，将当前用户最新的查看时间存放到数据库中，下次从redis中只需要查询上次查询之后访问的用户数据
+        long currentTime = System.currentTimeMillis();
+        redisTemplate.opsForHash().put(key,hashKey,String.valueOf(currentTime));
+        return vos;
+
+
+
 
     }
 }
