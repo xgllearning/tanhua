@@ -19,6 +19,8 @@ import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +57,7 @@ public class SmallVideosService {
      * @param videoThumbnail
      * @param videoFile
      */
+    @CacheEvict(value="videos",allEntries = true)//发布视频的时候，清空查询缓存
     public void saveVideos(MultipartFile videoThumbnail, MultipartFile videoFile) throws IOException {
         //1.首先判断前台有没有传过来文件，如果没有传递则抛出异常
         if(videoThumbnail.isEmpty()||videoFile.isEmpty()){
@@ -88,6 +91,9 @@ public class SmallVideosService {
      * @param pagesize
      * @return
      */
+    @Cacheable(//设置缓存，缓解数据库压力
+            value="videos",
+            key = "T(com.tanhua.server.interceptor.UserHolder).getUserId()+'_'+#page+'_'+#pagesize")  //userid _ page_pagesize
     public PageResult queryVideoList(Integer page, Integer pagesize) {
         //1.先去redis中查询是否存在推荐数据，拼接redisKey
         String redisKey= Constants.VIDEOS_RECOMMEND+UserHolder.getUserId();
