@@ -20,6 +20,10 @@ public class UserService {
      * key: 支持springel
      * redis-key的命名规则：
      *      value + "::" + key
+     *@Cacheable 注解表示这个方法有了缓存的功能，方法的返回值会被缓存下来
+     * 下一次调用该方法前，会去检查是否缓存中已经有值，如果有就直接返回，不调用方法。如果没有，就调用方法，然后把结果缓存起来。
+     *
+     *
      */
     //@Cacheable(value="user" , key = "'test' + #id")
     //@CachePut(value="user" , key = "'test' + #id")
