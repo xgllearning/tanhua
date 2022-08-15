@@ -29,11 +29,11 @@ tanhua:
     accessKey:
     secret:
   oss:
-    accessKey:
-    secret:
-    endpoint:
-    bucketName:
-    url:
+    accessKey: 
+    secret: 
+    endpoint: 
+    bucketName: 
+    url: 
   aip:
     appId:
     apiKey:
@@ -45,9 +45,9 @@ tanhua:
 #    clientId:
 #    clientSecret:
   huanxin:
-    appkey:
-    clientId:
-    clientSecret:
+    appkey: 
+    clientId: 
+    clientSecret: 
 logging:
   level:
     com:

@@ -1,0 +1,20 @@
+#启动的时候bootstrap是最先被加载的
+#以nacos中的端口为准
+server:
+  port: 18082
+spring:
+  #多环境切换${prefix}-${spring.profiles.active}.${file-extension}
+  application:
+    name: tanhua-dubbo-mongo
+  profiles:
+    active: prod
+  cloud:
+    nacos:
+      discovery:
+        #nacos注册中心
+        server-addr: 192.168.136.160:8848
+      config:
+        #配置中心地址
+        server-addr: 192.168.136.160:8848
+        #多环境切换
+        file-extension: yml
