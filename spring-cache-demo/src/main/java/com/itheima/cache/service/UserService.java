@@ -26,19 +26,21 @@ public class UserService {
      *
      */
     //@Cacheable(value="user" , key = "'test' + #id")
-    //@CachePut(value="user" , key = "'test' + #id")
-    @Cacheable(value = "user")//加入注解支持,第一次从数据库中查询，查询完成后会把数据存放到缓存(名称就叫user)，第二次从缓存中获取
+    //@Cacheable(value = "user")//加入注解支持,第一次从数据库中查询，查询完成后会把数据存放到缓存(名称就叫user)，第二次从缓存中获取
+    @CachePut(value="user" , key = "'test' + #id")
     public User findById(Long id) {
         return userDao.findById(id);
     }
 
-    //@CacheEvict(value="user" , key = "'test' + #id")
+
+    //更新数据库时，删除redis中的缓存数据
 //    @Caching(
 //            evict = {
 //                    @CacheEvict(value="user" , key = "'test' + #id"),
 //                    @CacheEvict(value="user" , key = "#id")
 //            }
 //    )
+@CacheEvict(value="user" , key = "'test' + #id")//执行完成后，清空指定的缓存，user-->user::test#id
     public void update(Long id) {
         userDao.update(id);
     }

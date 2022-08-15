@@ -29,9 +29,9 @@ public class UserServiceTest {
 //        System.out.println(user);
     }
 
-    //更新：更新数据库，删除redis中的缓存数据
+    //更新：更新数据库，删除redis中的缓存数据，通过加注解实现
     @Test
     public void testUpdate() {
-        userService.update(2l);
+        userService.update(1l);
     }
 }
