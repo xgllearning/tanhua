@@ -6,6 +6,7 @@ import com.tanhua.admin.interceptor.AdminHolder;
 import com.tanhua.admin.service.AdminService;
 import com.tanhua.commons.utils.Constants;
 import com.tanhua.model.domain.Admin;
+import com.tanhua.model.vo.AdminVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -55,6 +56,15 @@ public class SystemController {
     public ResponseEntity login(@RequestBody Map map) {
         Map retMap = adminService.login(map);
         return ResponseEntity.ok(retMap);
+    }
+
+    /**
+     * 获取用户的信息
+     */
+    @PostMapping("/profile")
+    public ResponseEntity profile() {
+        AdminVo vo = adminService.profile();
+        return ResponseEntity.ok(vo);
     }
 
 }

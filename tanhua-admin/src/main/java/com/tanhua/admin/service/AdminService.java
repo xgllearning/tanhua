@@ -5,10 +5,12 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.admin.exception.BusinessException;
+import com.tanhua.admin.interceptor.AdminHolder;
 import com.tanhua.admin.mapper.AdminMapper;
 import com.tanhua.commons.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.model.domain.Admin;
+import com.tanhua.model.vo.AdminVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -75,6 +77,15 @@ public class AdminService {
         String token = JwtUtils.getToken(claims);
         //10.构造返回值
         Map<String, String> res = new HashMap<>();
+        res.put("token",token);
         return res;
+    }
+
+    public AdminVo profile() {
+        //获取token中携带的用户id
+        Long userId = AdminHolder.getUserId();
+        Admin admin = adminMapper.selectById(userId);
+        AdminVo adminVo = AdminVo.init(admin);
+        return adminVo;
     }
 }
