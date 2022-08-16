@@ -141,4 +141,34 @@ public class MovementApiImpl implements MovementApi {
     public Movement findById(String movementId) {
         return mongoTemplate.findById(movementId,Movement.class);
     }
+
+    /**
+     * 多条件查询动态--用户管理(根据用户id)和动态审核中(根据状态，查询全部、查询审核过的、查询未审核过的、查询审核失败的)
+     * @param page
+     * @param pagesize
+     * @param uid
+     * @param state
+     * @return
+     */
+    @Override
+    public PageResult findByUidOrState(Integer page, Integer pagesize, Long uid, Integer state) {
+        //1.因为是多条件查询，因此通过new Query，根据条件不同添加Criteria条件
+        Query query = new Query();
+        //2.当用户id不为null时，说明的是查询当前用户动态
+        if(uid!=null){
+            query.addCriteria(Criteria.where("userId").is(uid));
+        }
+        //3.当状态不为null时，就是根据审核状态进行查询
+        if (state!=null){
+            query.addCriteria(Criteria.where("state").is(state));
+        }
+        //分页、排序
+        query.skip((page-1)*pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
+        //调用mongoTemplate进行查询
+        long count = mongoTemplate.count(query, Movement.class);
+        List<Movement> movements = mongoTemplate.find(query, Movement.class);
+
+        return new PageResult(page,pagesize, Math.toIntExact(count),movements);
+    }
+
 }

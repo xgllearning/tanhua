@@ -52,4 +52,14 @@ public class ManageController {
         PageResult result = managerService.findAllVideos(page,pagesize,uid);
         return ResponseEntity.ok(result);
     }
+
+    //查询动态
+    //在用户管理(根据用户id)和动态审核中(根据状态，查询全部、查询审核过的、查询未审核过的、查询审核失败的)都需要使用
+    @GetMapping("/messages")
+    public ResponseEntity messages(@RequestParam(defaultValue = "1") Integer page,
+                                   @RequestParam(defaultValue = "10") Integer pagesize,
+                                   Long uid,Integer state) {
+        PageResult result = managerService.findAllMovements(page,pagesize,uid,state);
+        return ResponseEntity.ok(result);
+    }
 }

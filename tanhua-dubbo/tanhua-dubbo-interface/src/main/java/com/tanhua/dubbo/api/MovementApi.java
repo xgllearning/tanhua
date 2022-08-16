@@ -46,4 +46,6 @@ public interface MovementApi {
     List<Movement> findMovementsByPids(List<Long> pids);
     //查看单条动态
     Movement findById(String movementId);
+    //多条件查询动态--用户管理(根据用户id)和动态审核中(根据状态，查询全部、查询审核过的、查询未审核过的、查询审核失败的)
+    PageResult findByUidOrState(Integer page, Integer pagesize, Long uid, Integer state);
 }
