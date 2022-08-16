@@ -2,7 +2,10 @@ package com.tanhua.admin.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.tanhua.commons.utils.Constants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.dubbo.api.VideoApi;
@@ -12,11 +15,16 @@ import com.tanhua.model.mongo.Video;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ManagerService {
@@ -29,6 +37,9 @@ public class ManagerService {
 
     @DubboReference
     private MovementApi movementApi;
+
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
 
     /**
      * 分页查询用户信息
@@ -44,6 +55,12 @@ public class ManagerService {
         if (CollUtil.isEmpty(userInfos)){
             return new PageResult();
         }
+        for (UserInfo userInfo : userInfos) {
+            String redisKey = Constants.USER_FREEZE+userInfo.getId();
+            if (redisTemplate.hasKey(redisKey)){
+                userInfo.setUserStatus("2");
+            }
+        }
         return new PageResult(page,pagesize, Math.toIntExact(myPage.getTotal()),userInfos);
     }
 
@@ -53,7 +70,12 @@ public class ManagerService {
      * @return
      */
     public UserInfo findUserById(Long userId) {
+        //查询完成后，用户状态属性为userStatus = "1"，默认，此时应该从redis中查询具体状态
         UserInfo userInfo = userInfoApi.findById(userId);
+        String redisKey = Constants.USER_FREEZE+userInfo.getId();
+        if (redisTemplate.hasKey(redisKey)){
+            userInfo.setUserStatus("2");
+        }
         return userInfo;
     }
 
@@ -111,5 +133,53 @@ public class ManagerService {
         //封装pageResult对象返回
         pageResult.setItems(vos);
         return pageResult;
+    }
+
+    /**
+     * 用户冻结
+     * @param params
+     * @return
+     */
+    public Map userFreeze(Map params) {
+        //1.解析参数构造key
+        String userId = params.get("userId").toString();
+        String redisKey = Constants.USER_FREEZE+userId;
+        //2.构造失效时间
+        Integer freezingTime = Convert.convert(Integer.class, params.get("freezingTime"));
+        //Integer freezingTime = (Integer) params.get("freezingTime");//冻结时间：1为3天，2为7天，3为永久
+        int day = 0;
+        if (freezingTime==1){
+            day=1;
+        }else if (freezingTime==2){
+            day=7;
+        }else if (freezingTime==3){
+            day=-1;
+        }
+        //3.将数据存入redis中并设置失效时间
+        String value = JSON.toJSONString(params);
+        if (day>0){
+            redisTemplate.opsForValue().set(redisKey,value,day, TimeUnit.DAYS);
+        }else {
+            redisTemplate.opsForValue().set(redisKey,value);
+        }
+        Map<String, String> map = new HashMap<>();
+        map.put("message","冻结成功");
+        return map;
+    }
+
+    /**
+     * 用户解冻
+     * @param params
+     * @return
+     */
+    public Map userUnfreeze(Map params) {
+        //删除redis中的数据
+        String userId =  params.get("userId").toString();
+        //拼接key
+        String redisKey = Constants.USER_FREEZE+userId;
+        redisTemplate.delete(redisKey);
+        Map map = new HashMap();
+        map.put("message","解冻成功");
+        return map;
     }
 }

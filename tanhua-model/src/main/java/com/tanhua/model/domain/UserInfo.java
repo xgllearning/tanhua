@@ -34,6 +34,6 @@ public class UserInfo extends BasePojo {
     private String coverPic; // 封面图片
 
     //用户状态,1为正常，2为冻结
-    @TableField(exist = false)//忽略该字段的插入查询
+    @TableField(exist = false)//忽略该字段的插入查询,不映射此属性，即数据库表中不存在，只在userInfo中存在
     private String userStatus = "1";
 }

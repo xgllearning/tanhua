@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/manage")
 public class ManageController {
@@ -61,5 +63,26 @@ public class ManageController {
                                    Long uid,Integer state) {
         PageResult result = managerService.findAllMovements(page,pagesize,uid,state);
         return ResponseEntity.ok(result);
+    }
+
+
+
+    /**用户冻结
+     * 接口路径	/manage/users/freeze
+     * 请求方式	POST
+     * 请求参数	map
+     * 响应结果	message
+     */
+    @PostMapping("/users/freeze")
+    public ResponseEntity freeze(@RequestBody Map params) {
+        Map map =  managerService.userFreeze(params);
+        return ResponseEntity.ok(map);
+    }
+
+    //用户解冻
+    @PostMapping("/users/unfreeze")
+    public ResponseEntity unfreeze(@RequestBody  Map params) {
+        Map map =  managerService.userUnfreeze(params);
+        return ResponseEntity.ok(map);
     }
 }
