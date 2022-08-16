@@ -40,5 +40,14 @@ public class ManagerService {
         return new PageResult(page,pagesize, Math.toIntExact(myPage.getTotal()),userInfos);
     }
 
+    /**
+     * 查询用户详情
+     * @param userId
+     * @return
+     */
+    public UserInfo findUserById(Long userId) {
+        UserInfo userInfo = userInfoApi.findById(userId);
+        return userInfo;
+    }
 
 }

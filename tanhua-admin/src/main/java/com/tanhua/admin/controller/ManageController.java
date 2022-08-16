@@ -30,6 +30,16 @@ public class ManageController {
         PageResult result = managerService.findAllUsers(page,pagesize);
         return ResponseEntity.ok(result);
     }
-
+    /**
+     * 根据id查询用户详情
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("/users/{userId}")
+    public ResponseEntity findUserById(@PathVariable("userId") Long userId) {
+        UserInfo userInfo = managerService.findUserById(userId);
+        return ResponseEntity.ok(userInfo);
+    }
 
 }
