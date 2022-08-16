@@ -40,11 +40,20 @@ public class UserService {
 
     @DubboReference
     private UserApi userApi;
+
+    @Autowired
+    private UserFreezeService userFreezeService;
     /**
      * 发送短信验证码
      * @param phone
      */
     public ResponseEntity sendMsg(String phone) {
+        //TODO：优化冻结，首先查询手机号是否存在，如果存在则查看是否冻结，如果是新用户则不需要查看冻结状态
+        User user = userApi.findByMobile(phone);
+        if (user!=null){
+            userFreezeService.checkUserStatus(1,user.getId());
+        }
+
         //1.随机生成6位数字
         //String code = RandomStringUtils.randomNumeric(6);
         String code="123456";

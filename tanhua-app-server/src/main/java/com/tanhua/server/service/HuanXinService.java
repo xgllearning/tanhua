@@ -5,6 +5,7 @@ import com.tanhua.model.domain.User;
 import com.tanhua.model.vo.HuanXinUserVo;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,6 +14,8 @@ public class HuanXinService {
     @DubboReference
     private UserApi userApi;
 
+    @Autowired
+    private UserFreezeService userFreezeService;
     /**
      *查询环信用户信息
      * 查询当前用户的环信账号

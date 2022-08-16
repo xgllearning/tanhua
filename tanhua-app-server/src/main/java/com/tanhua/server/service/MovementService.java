@@ -45,6 +45,8 @@ public class MovementService {
     @DubboReference
     private VisitorsApi visitorsApi;
 
+    @Autowired
+    private UserFreezeService userFreezeService;
     /**
      * 发布动态，imageContet-可以携带多张文件，采用数组
      *textContent文字动态
@@ -55,6 +57,9 @@ public class MovementService {
      * @param imageContent
      */
     public void publishMovement(Movement movement, MultipartFile[] imageContent) throws IOException {
+        //TODO：优化冻结,冻结发布动态
+        userFreezeService.checkUserStatus(3,UserHolder.getUserId());
+
         //1.判断参数textContent文字动态是否为空，如果为空则抛出自定义异常
         if (StringUtils.isEmpty(movement.getTextContent())){
             throw new BusinessException(ErrorResult.contentError());
