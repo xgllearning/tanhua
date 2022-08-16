@@ -61,4 +61,23 @@ public class VideoApiImpl implements VideoApi{
         List<Video> videos = mongoTemplate.find(query, Video.class);
         return videos;
     }
+
+    /**
+     * 根据id分页查询
+     * @param page
+     * @param pagesize
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<Video> findByUserId(Integer page, Integer pagesize, Long uid) {
+        //构造查询条件
+        Query query = Query.query(Criteria.where("userId").is(uid)).skip((page - 1) * pagesize).limit(pagesize)
+                .with(Sort.by(Sort.Order.desc("created")));
+        long count = mongoTemplate.count(query, Video.class);
+        List<Video> videos = mongoTemplate.find(query, Video.class);
+
+
+        return videos;
+    }
 }

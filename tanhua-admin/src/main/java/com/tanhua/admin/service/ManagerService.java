@@ -50,4 +50,23 @@ public class ManagerService {
         return userInfo;
     }
 
+    /**
+     * 分页查询视频列表
+     * @param page
+     * @param pagesize
+     * @param uid
+     * @return
+     */
+    public PageResult findAllVideos(Integer page, Integer pagesize, Long uid) {
+        //根据uid分页查询
+        List<Video> videos = videoApi.findByUserId(page,pagesize,uid);
+
+        if (CollUtil.isEmpty(videos)){
+            return new PageResult();
+        }
+
+        int count = videos.size();
+        return new PageResult(page,pagesize,count,videos);
+    }
+
 }

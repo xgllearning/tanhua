@@ -12,4 +12,6 @@ public interface VideoApi {
     List<Video> findMovementsByVids(List<Long> vidList);
     //分页查询video
     List<Video> queryVideoList(int page, Integer pagesize);
+    //根据uid分页查询
+    List<Video> findByUserId(Integer page, Integer pagesize, Long uid);
 }

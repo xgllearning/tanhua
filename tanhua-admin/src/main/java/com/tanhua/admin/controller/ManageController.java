@@ -42,4 +42,14 @@ public class ManageController {
         return ResponseEntity.ok(userInfo);
     }
 
+    /**
+     * 查询指定用户发布的所有视频列表
+     */
+    @GetMapping("/videos")
+    public ResponseEntity videos(@RequestParam(defaultValue = "1") Integer page,
+                                 @RequestParam(defaultValue = "10") Integer pagesize,
+                                 Long uid ) {
+        PageResult result = managerService.findAllVideos(page,pagesize,uid);
+        return ResponseEntity.ok(result);
+    }
 }
