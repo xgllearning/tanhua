@@ -2,6 +2,7 @@ package com.tanhua.dubbo.api;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tanhua.dubbo.mappers.UserInfoMapper;
 import com.tanhua.model.domain.UserInfo;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +67,20 @@ public class UserInfoApiImpl implements UserInfoApi {
         Map<Long, UserInfo> map = CollUtil.fieldValueMap(infoList,"id");
 
         return map;
+    }
+
+    /**
+     * 分页查询
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    @Override
+    public Page<UserInfo> findAll(Integer page, Integer pagesize) {
+
+        Page<UserInfo> infoPage = new Page<>(page, pagesize);
+        //无条件则直接null
+        return userInfoMapper.selectPage(infoPage,null);
     }
 
 

@@ -1,5 +1,6 @@
 package com.tanhua.dubbo.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tanhua.model.domain.UserInfo;
 
 import java.util.List;
@@ -20,4 +21,12 @@ public interface UserInfoApi {
      参数：推荐的用户id，以及查询条件
      */
     Map<Long, UserInfo> findByIds(List<Long> userIds, UserInfo info);
+
+    /**
+     * 分页查询
+     * @param page
+     * @param pagesize
+     * @return
+     */
+    Page<UserInfo> findAll(Integer page, Integer pagesize);
 }
