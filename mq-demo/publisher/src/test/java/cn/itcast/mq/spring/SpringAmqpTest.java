@@ -20,7 +20,7 @@ public class SpringAmqpTest {
         String message = "hello,spring amqp";
 
         //两个参数，队列名称和消息
-        rabbitTemplate.convertAndSend(queueName,message);
+        rabbitTemplate.convertAndSend(queueName, message);
     }
 
     @Test
@@ -33,4 +33,15 @@ public class SpringAmqpTest {
         }
     }
 
+
+    //发布订阅-Fanout Exchange
+    @Test
+    public void testSendFanoutExchange() {
+        // 交换机名称
+        String exchangeName = "itcast.fanout";
+        // 消息
+        String message = "hello, every one!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(exchangeName, "", message);//一次发送多个消费者接收同一个消息
+    }
 }
