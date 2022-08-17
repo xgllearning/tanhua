@@ -44,4 +44,15 @@ public class SpringAmqpTest {
         // 发送消息
         rabbitTemplate.convertAndSend(exchangeName, "", message);//一次发送多个消费者接收同一个消息
     }
+
+    //发布订阅-DirectExchange，Exchange将消息路由到BindingKey与消息RoutingKey一致的队列
+    @Test
+    public void testSendDirectExchange() {
+        // 交换机名称
+        String exchangeName = "itcast.direct";
+        // 消息
+        String message = "hello, red!";
+        // 发送消息
+        rabbitTemplate.convertAndSend(exchangeName, "red", message);
+    }
 }
