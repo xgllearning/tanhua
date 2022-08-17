@@ -1,3 +1,11 @@
 logging:
   pattern:
     dateformat: MM-dd HH:mm:ss:SSS
+
+spring:
+  rabbitmq:
+    host: 192.168.177.128 #配置rabbitMQ的ip地址
+    port: 5672 #端口号
+    username: itcast
+    password: 123321
+    virtual-host: / #虚拟主机地址
