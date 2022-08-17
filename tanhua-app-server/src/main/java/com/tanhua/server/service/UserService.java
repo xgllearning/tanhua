@@ -9,6 +9,7 @@ import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.server.exception.BusinessException;
+import com.tanhua.server.messageUtils.MqMessageService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,8 @@ public class UserService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private MqMessageService mqMessageService;
     /**
      * 发送短信验证码
      * @param phone
@@ -120,19 +123,21 @@ public class UserService {
 
         }
         //TODO:rabbitTemplate发送消息，记录日志，此处为登录，为了防止对业务逻辑产生影响，使用try-catch,通过map携带tb_log表中的字段，消费者消费存入数据库
-        try {
-            //发送的消息需要保存到tb_log，封装属性
-            Map map = new HashMap<>();
-            map.put("userId",user.getId().toString());
-            map.put("type",type);
-            map.put("logTime",new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-            String message = JSON.toJSONString(map);
-            //routingKey规则：long.*-用户相关user , 动态相关movement , 小视频相关 video
-            rabbitTemplate.convertAndSend("tanhua.log.exchange","log.user",message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            //发送的消息需要保存到tb_log，封装属性
+//            Map map = new HashMap<>();
+//            map.put("userId",user.getId().toString());
+//            map.put("type",type);
+//            map.put("logTime",new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+//            String message = JSON.toJSONString(map);
+//            //routingKey规则：long.*-用户相关user , 动态相关movement , 小视频相关 video
+//            rabbitTemplate.convertAndSend("tanhua.log.exchange","log.user",message);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
+        //调用mqMessageService工具类记录日志
+        mqMessageService.sendLogMessage(user.getId(),type,"user",null);
         //6.通过JWT工具类生成token(根据id和phone生成)
         HashMap tokenMap = new HashMap<>();
         tokenMap.put("id",user.getId());

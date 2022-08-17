@@ -15,6 +15,7 @@ import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
+import com.tanhua.server.messageUtils.MqMessageService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class MovementService {
 
     @Autowired
     private UserFreezeService userFreezeService;
+    //0101为登录，0201为发动态，0202为浏览动态，0203为动态点赞，0204为动态喜欢，0205为评论，0206为动态取消点赞，0207为动态取消喜欢，0301为发小视频，0302为小视频点赞，0303为小视频取消点赞，0304为小视频评论
+    @Autowired
+    private MqMessageService mqMessageService;
     /**
      * 发布动态，imageContet-可以携带多张文件，采用数组
      *textContent文字动态
@@ -76,6 +80,8 @@ public class MovementService {
         movement.setUserId(userId);
         movement.setMedias(medias);
         //5、调用movementApi完成发布动态
+        //发布动态日志记录
+        mqMessageService.sendLogMessage(UserHolder.getUserId(),"0201","movement",movement.getId().toHexString());
         movementApi.publish(movement);
     }
 
@@ -197,6 +203,9 @@ public class MovementService {
      * @return
      */
     public MovementsVo findById(String movementId) {
+        //记录日志,查看动态是0202
+        mqMessageService.sendLogMessage(UserHolder.getUserId(),"0202","movement",movementId);
+
         //1、调用movementApi根据movementId查询动态详情
         Movement movement = movementApi.findById(movementId);
         //2、转化vo对象
