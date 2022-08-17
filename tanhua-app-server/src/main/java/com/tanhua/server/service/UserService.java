@@ -1,5 +1,6 @@
 package com.tanhua.server.service;
 
+import com.alibaba.fastjson.JSON;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.autoconfig.template.SmsTemplate;
 import com.tanhua.commons.utils.Constants;
@@ -12,11 +13,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,6 +46,9 @@ public class UserService {
 
     @Autowired
     private UserFreezeService userFreezeService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     /**
      * 发送短信验证码
      * @param phone
@@ -83,11 +89,13 @@ public class UserService {
         }
         //3.验证码通过后，删除redis中的验证码
         redisTemplate.delete("CHECK_CODE_" + phone);
-        //4.通过手机号码查询用户,DubboReference引用UserApi接口
+        //4.通过手机号码查询用户,DubboReference引用UserApi接口,查询出用户则为登录，没查询出来就是注册
         User user = userApi.findByMobile(phone);
         //5.判断用户存不存在,如果不存在需要保存到数据库,如果是新用户，还需要返回isNew=true
         boolean isNew = false;
+        String type="0101";//默认为登录
         if (Objects.isNull(user)){
+            type="0102";//没有用户设为注册
             user = new User();
             user.setMobile(phone);
 //            user.setCreated(new Date());
@@ -111,6 +119,20 @@ public class UserService {
             }
 
         }
+        //TODO:rabbitTemplate发送消息，记录日志，此处为登录，为了防止对业务逻辑产生影响，使用try-catch,通过map携带tb_log表中的字段，消费者消费存入数据库
+        try {
+            //发送的消息需要保存到tb_log，封装属性
+            Map map = new HashMap<>();
+            map.put("userId",user.getId().toString());
+            map.put("type",type);
+            map.put("logTime",new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            String message = JSON.toJSONString(map);
+            //routingKey规则：long.*-用户相关user , 动态相关movement , 小视频相关 video
+            rabbitTemplate.convertAndSend("tanhua.log.exchange","log.user",message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         //6.通过JWT工具类生成token(根据id和phone生成)
         HashMap tokenMap = new HashMap<>();
         tokenMap.put("id",user.getId());
