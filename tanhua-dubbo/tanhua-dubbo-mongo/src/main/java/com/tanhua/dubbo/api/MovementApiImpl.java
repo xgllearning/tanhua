@@ -49,6 +49,7 @@ public class MovementApiImpl implements MovementApi {
             movement.setCreated(System.currentTimeMillis());
             //保存数据
             mongoTemplate.save(movement);
+            //执行抽取的异步代码
             timeLineService.saveTimeLine(movement.getUserId(), movement.getId(), movement.getCreated());
             //TODO：抽取以下代码，异步执行，解决大量的时间线数据同步写入的问题
 //            //2.查询好友表,查询当前用户的好友-返回List列表
