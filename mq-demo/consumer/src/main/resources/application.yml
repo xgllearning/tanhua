@@ -8,3 +8,6 @@ spring:
     username: itcast
     password: 123321
     virtual-host: / #虚拟主机地址
+    listener:
+      simple:
+        prefetch: 1 #能者多劳，解决消息预取机制，此时每次只能获取一条消息，处理完成才能获取下一个消息
